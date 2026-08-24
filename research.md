@@ -70,7 +70,7 @@ npm run build -w @deck/worker
 ### Build Dependencies
 
 - Node.js 22, npm 10+
-- Worker runtime: `chromium`, `fonts-liberation`, `fonts-noto-core` (or equivalent)
+- Worker runtime: Google Chrome + `fonts-liberation` + `fonts-noto` (Ubuntu has no chromium deb)
 
 ### Build Output
 

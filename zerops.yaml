@@ -139,13 +139,18 @@ zerops:
     run:
       base: nodejs@22
       os: ubuntu
+      # Ubuntu ships Chromium as a snap and fonts-noto-core only on
+      # 24.04 — both 100 apt. Chrome is a real .deb Playwright can launch.
       prepareCommands:
         - sudo apt-get update
-        - sudo apt-get install -y --no-install-recommends chromium fonts-liberation fonts-noto-core
+        - sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates fonts-liberation fonts-noto
+        - curl -fsSL -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        - sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends /tmp/chrome.deb
+        - rm -f /tmp/chrome.deb
       envVariables:
         NODE_ENV: production
         RENDER_DRIVER: chromium
-        CHROMIUM_PATH: /usr/bin/chromium
+        CHROMIUM_PATH: /usr/bin/google-chrome-stable
         DATABASE_URL: ${db_connectionString}
         VALKEY_URL: ${cache_connectionString}
         NATS_HOST: ${queue_hostname}
@@ -169,11 +174,14 @@ zerops:
       os: ubuntu
       prepareCommands:
         - sudo apt-get update
-        - sudo apt-get install -y --no-install-recommends chromium fonts-liberation fonts-noto-core
+        - sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates fonts-liberation fonts-noto
+        - curl -fsSL -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        - sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends /tmp/chrome.deb
+        - rm -f /tmp/chrome.deb
       envVariables:
         NODE_ENV: development
         RENDER_DRIVER: chromium
-        CHROMIUM_PATH: /usr/bin/chromium
+        CHROMIUM_PATH: /usr/bin/google-chrome-stable
         DATABASE_URL: ${db_connectionString}
         VALKEY_URL: ${cache_connectionString}
         NATS_HOST: ${queue_hostname}
