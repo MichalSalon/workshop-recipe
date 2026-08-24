@@ -1,0 +1,40 @@
+recipe_created: deck-renderer
+files_created:
+  - README.md
+  - AGENTS.md
+  - CLAUDE.md
+  - research.md
+  - zerops.yaml
+  - .env.example
+  - apps/frontend/
+  - apps/api/
+  - apps/worker/
+  - packages/shared/
+  - packages/engine/
+  - tests/
+  - workshop/logs/
+  - workshop/dev/
+  - workshop/dev/import-app.yaml
+  - workshop/prod/
+  - workshop/FACILITATOR.md
+  - .github/workflows/regression.yml
+apps_created:
+  - zeropsio/workshop-recipe
+strapi_fields:
+  recipe_name: Deck Renderer
+  slug: deck-renderer
+  recipe_source: deck-renderer
+  languages_frameworks: [Node.js, React]
+ready_for_testing: false
+notes:
+  - Intentional deviation from the six-environment _template: three workshop
+    projects (logs / dev / prod).
+  - Repo-root zerops.yaml setups: frontend, frontend-dev, api, api-dev,
+    worker, worker-dev, logquery. No Dockerfile.
+  - workshop/prod zeropsSetup names match zerops.yaml.
+  - workshop/logs logquery uses zeropsSetup: logquery (no inline zeropsYaml).
+  - buildFromGit URLs assume https://github.com/zeropsio/workshop-recipe.
+  - ELK pieces reuse zerops-recipe-apps elk-kibana-app and elk-logstash-app.
+  - Cover SVG not requested; this is a workshop repo, not a GUI recipe page.
+  - Local build + npm test only. No Zerops MCP in this session.
+  - Not committed — awaiting review.
