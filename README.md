@@ -39,6 +39,7 @@ apps/worker     render process
 packages/shared types, slide split
 packages/engine jobs, lock, render, adapters
 workshop/       conference-ops projects (logs / dev / prod)
+recipes/        six-environment GUI recipe (deck-renderer)
 ```
 
 Regression: `npm test`. That suite is the proof a change did not break the app.

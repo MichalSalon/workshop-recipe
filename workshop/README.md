@@ -1,5 +1,7 @@
 # Conference projects
 
+GUI recipe (six lifecycle envs): [`recipes/deck-renderer/`](../recipes/deck-renderer/).
+
 Three Zerops projects, imported by humans — not by the on-stage agent.
 
 | Folder | Project | What to import |
