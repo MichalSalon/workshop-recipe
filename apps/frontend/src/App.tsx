@@ -42,19 +42,6 @@ function wsUrl(): string {
   return url.toString();
 }
 
-function NavLink({ href, children }: { href: string; children: string }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="text-sm text-zinc-600 transition-colors hover:text-zinc-950"
-    >
-      {children}
-    </a>
-  );
-}
-
 export function App() {
   const [source, setSource] = useState(SAMPLE_DECK);
   const [depth, setDepth] = useState(0);
@@ -102,7 +89,6 @@ export function App() {
         setBusy(false);
         setFailed(false);
         setNote("Render complete.");
-        setShowGuide(false);
         void refreshDepth();
       }
     };
@@ -188,12 +174,6 @@ export function App() {
               Zerops
             </span>
           </a>
-          <nav className="hidden items-center gap-6 md:flex">
-            <NavLink href={LINKS.docs}>Docs</NavLink>
-            <NavLink href={LINKS.app}>App</NavLink>
-            <NavLink href={LINKS.discord}>Discord</NavLink>
-            <NavLink href={LINKS.github}>GitHub</NavLink>
-          </nav>
           <Button
             asChild
             className="h-8 rounded-full bg-zinc-950 px-4 text-white hover:bg-zinc-800"
@@ -204,12 +184,6 @@ export function App() {
             </a>
           </Button>
         </div>
-        <nav className="flex gap-4 overflow-x-auto border-t border-zinc-100 px-4 py-2 md:hidden">
-          <NavLink href={LINKS.docs}>Docs</NavLink>
-          <NavLink href={LINKS.app}>App</NavLink>
-          <NavLink href={LINKS.discord}>Discord</NavLink>
-          <NavLink href={LINKS.github}>GitHub</NavLink>
-        </nav>
       </header>
 
       <section className="px-4 pb-6 pt-14 text-center sm:px-6 sm:pt-16">
@@ -246,6 +220,26 @@ export function App() {
               </Badge>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              {done && jobId ? (
+                <>
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={`${API}/api/jobs/${jobId}/pdf`}>
+                      <Download />
+                      Download PDF
+                    </a>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={exporting}
+                    onClick={() => void downloadPngs()}
+                  >
+                    {exporting ? <Loader2 className="animate-spin" /> : <ImageDown />}
+                    {slideCount === 1 ? "Download PNG" : "Download PNGs"}
+                  </Button>
+                </>
+              ) : null}
               <Button
                 type="button"
                 variant="outline"
