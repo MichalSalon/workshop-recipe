@@ -50,4 +50,4 @@ and the Vite SPA on `:5173`. Connection strings are optional locally.
 - Worker `prepareCommands` install Google Chrome + fonts on Ubuntu (`chromium` is a snap there). `CHROMIUM_PATH` is `/usr/bin/google-chrome-stable`.
 - NATS is `NATS_HOST` / `NATS_PORT` / `NATS_USER` / `NATS_PASSWORD` — not a single connection string (colons in generated passwords).
 - `LOG_QUERY_URL` / `LOG_QUERY_TOKEN` belong on the `zcp` service only. They reach a **different project** over HTTPS.
-- Favicon: `apps/frontend/public/favicon.svg`.
+- Favicon and mark: `apps/frontend/public/zerops-logo.png`.

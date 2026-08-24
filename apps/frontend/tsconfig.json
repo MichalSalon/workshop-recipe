@@ -9,6 +9,10 @@
     "skipLibCheck": true,
     "noEmit": true,
     "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "types": ["vite/client"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

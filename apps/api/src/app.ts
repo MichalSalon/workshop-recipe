@@ -75,17 +75,19 @@ export async function buildApp(deps: AppDeps) {
     return { ...job, progress };
   });
 
-  app.get<{ Params: { id: string; index: string } }>(
-    "/api/jobs/:id/slides/:index",
-    async (req, reply) => {
-      const png = await deps.store.getSlide(
-        req.params.id,
-        Number(req.params.index),
-      );
-      if (!png) return reply.code(404).send({ error: "not found" });
-      return reply.type("image/png").send(png);
-    },
-  );
+  app.get<{
+    Params: { id: string; index: string };
+    Querystring: { download?: string };
+  }>("/api/jobs/:id/slides/:index", async (req, reply) => {
+    const index = Number(req.params.index);
+    const png = await deps.store.getSlide(req.params.id, index);
+    if (!png) return reply.code(404).send({ error: "not found" });
+    const name = `slide-${String(index + 1).padStart(2, "0")}.png`;
+    if (req.query.download !== undefined) {
+      reply.header("content-disposition", `attachment; filename="${name}"`);
+    }
+    return reply.type("image/png").send(png);
+  });
 
   app.get<{ Params: { id: string } }>("/api/jobs/:id/pdf", async (req, reply) => {
     const pdf = await deps.store.getPdf(req.params.id);

@@ -63,6 +63,14 @@ describe("api contracts", () => {
     });
     expect(slide.statusCode).toBe(200);
     expect(slide.headers["content-type"]).toMatch(/png/);
+    expect(slide.headers["content-disposition"]).toBeUndefined();
+
+    const exported = await app.inject({
+      method: "GET",
+      url: `/api/jobs/${body.id}/slides/0?download=1`,
+    });
+    expect(exported.statusCode).toBe(200);
+    expect(exported.headers["content-disposition"]).toMatch(/slide-01\.png/);
 
     const pdf = await app.inject({
       method: "GET",
