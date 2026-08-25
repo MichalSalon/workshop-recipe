@@ -2,6 +2,10 @@
 
 GUI recipe (six lifecycle envs): [`recipes/deck-renderer/`](../recipes/deck-renderer/).
 
+**Attendees:** deployed frontend **`/`** — workshop homepage; **`/app`** — Deck Renderer.
+
+**Facilitator:** [`PETRA.md`](./PETRA.md) · demo notes in [`FACILITATOR.md`](./FACILITATOR.md).
+
 Three Zerops projects, imported by humans — not by the on-stage agent.
 
 | Folder | Project | What to import |

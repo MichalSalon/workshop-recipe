@@ -27,6 +27,7 @@
     "build": "npm run build -w @deck/shared && npm run build -w @deck/engine && npm run build -w @deck/api && npm run build -w @deck/worker && npm run build -w @deck/frontend",
     "test": "vitest run",
     "repro:scale": "tsx scripts/repro-scale.ts",
+    "repro:scale:prod": "REPLICAS=3 tsx scripts/repro-scale.ts",
     "migrate": "npm run migrate -w @deck/api"
   },
   "devDependencies": {
