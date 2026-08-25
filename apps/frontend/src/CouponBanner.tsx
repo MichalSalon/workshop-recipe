@@ -1,21 +1,31 @@
 import { ArrowRight, Download, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { downloadCouponImage } from "@/download-coupon-image";
 import { LINKS, WORKSHOP } from "@/workshop-config";
 
 const { coupon } = WORKSHOP;
 
-export function CouponBanner() {
+type CouponBannerProps = {
+  embedded?: boolean;
+};
+
+export function CouponBanner({ embedded = false }: CouponBannerProps) {
   return (
     <section
       aria-label="Workshop coupon"
-      className="relative z-10 overflow-hidden border-t border-primary/30 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20"
+      className={cn(
+        "relative overflow-hidden bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20",
+        embedded
+          ? "rounded-2xl border border-primary/30"
+          : "z-10 border-t border-primary/30",
+      )}
     >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_0%,rgba(94,234,212,0.25),transparent)]"
       />
-      <div className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:max-w-5xl">
+      <div className={cn("relative", embedded ? "px-5 py-6 sm:px-6 sm:py-8" : "mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:max-w-5xl")}>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0 space-y-4">
             <div className="flex items-center gap-2 text-primary">

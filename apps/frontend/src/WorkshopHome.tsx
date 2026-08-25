@@ -114,6 +114,10 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
               </li>
             ))}
           </ul>
+
+          <div className="mt-10">
+            <CouponBanner embedded />
+          </div>
         </section>
 
         <section className="border-y border-white/10 bg-[#0f1115]/80 px-4 py-14 sm:px-6 sm:py-16">
@@ -172,8 +176,6 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
             </div>
           </div>
         </section>
-
-        <CouponBanner />
       </main>
 
       <footer className="relative z-10 border-t border-white/10 px-4 py-10 sm:px-6">
