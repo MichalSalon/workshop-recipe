@@ -3,11 +3,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Eye,
   ImageDown,
   Layers,
   Loader2,
   Play,
   RotateCcw,
+  X,
 } from "lucide-react";
 import MarkdownIt from "markdown-it";
 import { splitSlides, type JobEvent, type SubmitJobResponse } from "@deck/shared";
@@ -50,9 +52,12 @@ export function App() {
   const [done, setDone] = useState(false);
   const [note, setNote] = useState("Idle — submit a deck.");
   const [failed, setFailed] = useState(false);
-  const [exporting, setExporting] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [exportingPngs, setExportingPngs] = useState(false);
   const [panelTab, setPanelTab] = useState<"editor" | "instructions">("editor");
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [renderPreviewOpen, setRenderPreviewOpen] = useState(false);
+  const [renderSlideIndex, setRenderSlideIndex] = useState(0);
 
   const drafts = useMemo(() => splitSlides(source), [source]);
   const preview = drafts[Math.min(previewIndex, drafts.length - 1)] ?? "";
@@ -134,6 +139,27 @@ export function App() {
     void refreshDepth();
   }, []);
 
+  useEffect(() => {
+    if (!renderPreviewOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setRenderPreviewOpen(false);
+      if (event.key === "ArrowLeft") {
+        setRenderSlideIndex((index) => Math.max(0, index - 1));
+      }
+      if (event.key === "ArrowRight") {
+        setRenderSlideIndex((index) => Math.min(slideCount - 1, index + 1));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [renderPreviewOpen, slideCount]);
+
+  useEffect(() => {
+    if (renderSlideIndex > slideCount - 1) {
+      setRenderSlideIndex(Math.max(0, slideCount - 1));
+    }
+  }, [renderSlideIndex, slideCount]);
+
   const ratio = useMemo(() => {
     if (!slideCount) return 0;
     return Math.min(100, Math.round((progress / slideCount) * 100));
@@ -182,13 +208,16 @@ export function App() {
     const link = document.createElement("a");
     link.href = url;
     link.download = filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   async function downloadPdf() {
-    if (!jobId) return;
-    setExporting(true);
+    if (!jobId || exportingPdf || exportingPngs) return;
+    setExportingPdf(true);
     try {
       const res = await fetch(`${API}/api/jobs/${jobId}/pdf`);
       if (!res.ok) throw new Error("pdf export failed");
@@ -196,13 +225,13 @@ export function App() {
     } catch {
       setNote("PDF export failed.");
     } finally {
-      setExporting(false);
+      setExportingPdf(false);
     }
   }
 
   async function downloadPngs() {
-    if (!jobId || !slideCount) return;
-    setExporting(true);
+    if (!jobId || !slideCount || exportingPdf || exportingPngs) return;
+    setExportingPngs(true);
     try {
       for (let index = 0; index < slideCount; index += 1) {
         const res = await fetch(
@@ -213,12 +242,24 @@ export function App() {
           await res.blob(),
           `slide-${String(index + 1).padStart(2, "0")}.png`,
         );
+        if (index < slideCount - 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 200));
+        }
       }
     } catch {
       setNote("PNG export failed.");
     } finally {
-      setExporting(false);
+      setExportingPngs(false);
     }
+  }
+
+  function slideImageUrl(id: string, index: number) {
+    return `${API}/api/jobs/${id}/slides/${index}`;
+  }
+
+  function openRenderPreview(index = 0) {
+    setRenderSlideIndex(index);
+    setRenderPreviewOpen(true);
   }
 
   return (
@@ -274,20 +315,29 @@ export function App() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    disabled={exporting}
+                    onClick={() => openRenderPreview(0)}
+                  >
+                    <Eye />
+                    Preview
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={exportingPdf || exportingPngs}
                     onClick={() => void downloadPdf()}
                   >
-                    {exporting ? <Loader2 className="animate-spin" /> : <Download />}
+                    {exportingPdf ? <Loader2 className="animate-spin" /> : <Download />}
                     Download PDF
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    disabled={exporting}
+                    disabled={exportingPdf || exportingPngs}
                     onClick={() => void downloadPngs()}
                   >
-                    {exporting ? <Loader2 className="animate-spin" /> : <ImageDown />}
+                    {exportingPngs ? <Loader2 className="animate-spin" /> : <ImageDown />}
                     {slideCount === 1 ? "Download PNG" : "Download PNGs"}
                   </Button>
                 </>
@@ -412,42 +462,23 @@ export function App() {
 
                 {done && jobId ? (
                   <div className="mt-6 space-y-3">
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={exporting}
-                        onClick={() => void downloadPdf()}
-                      >
-                        {exporting ? <Loader2 className="animate-spin" /> : <Download />}
-                        Download PDF
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={exporting}
-                        onClick={() => void downloadPngs()}
-                      >
-                        {exporting ? <Loader2 className="animate-spin" /> : <ImageDown />}
-                        {slideCount === 1 ? "Download PNG" : "Download PNGs"}
-                      </Button>
-                    </div>
+                    <p className="text-zinc-400">
+                      Preview rendered slides in the toolbar, then download the PDF or PNGs.
+                    </p>
                     <div className="grid grid-cols-2 gap-2">
                       {Array.from({ length: slideCount }, (_, index) => (
-                        <a
+                        <button
                           key={index}
-                          href={`${API}/api/jobs/${jobId}/slides/${index}?download=1`}
-                          download={`slide-${String(index + 1).padStart(2, "0")}.png`}
-                          className="overflow-hidden rounded-md border border-white/10"
+                          type="button"
+                          onClick={() => openRenderPreview(index)}
+                          className="overflow-hidden rounded-md border border-white/10 transition hover:border-primary/50"
                         >
                           <img
                             alt={`Slide ${index + 1}`}
-                            src={`${API}/api/jobs/${jobId}/slides/${index}`}
+                            src={slideImageUrl(jobId, index)}
                             className="aspect-video w-full object-cover"
                           />
-                        </a>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -529,8 +560,8 @@ export function App() {
               </p>
             </li>
             <li>
-              <span className="font-medium text-white">3. Export</span>
-              <p className="text-zinc-400">Download PNG slides or the full PDF.</p>
+              <span className="font-medium text-white">3. Preview & export</span>
+              <p className="text-zinc-400">Preview rendered slides, then download PNG or PDF.</p>
             </li>
           </ol>
         </div>
@@ -567,6 +598,82 @@ export function App() {
           </div>
         </div>
       </footer>
+
+      {renderPreviewOpen && jobId ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:p-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Rendered slide preview"
+          onClick={() => setRenderPreviewOpen(false)}
+        >
+          <div
+            className="flex w-full max-w-5xl flex-col gap-4"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between text-white">
+              <p className="text-sm font-medium">
+                Slide{" "}
+                <span className="tabular-nums text-zinc-300">
+                  {renderSlideIndex + 1} / {slideCount}
+                </span>
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/10"
+                onClick={() => setRenderPreviewOpen(false)}
+              >
+                <X />
+                <span className="sr-only">Close preview</span>
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="shrink-0 border-white/20 bg-black/40 text-white hover:bg-white/10"
+                disabled={renderSlideIndex === 0}
+                onClick={() =>
+                  setRenderSlideIndex((index) => Math.max(0, index - 1))
+                }
+              >
+                <ChevronLeft />
+                <span className="sr-only">Previous slide</span>
+              </Button>
+
+              <img
+                alt={`Slide ${renderSlideIndex + 1}`}
+                src={slideImageUrl(jobId, renderSlideIndex)}
+                className="max-h-[70vh] w-full rounded-lg border border-white/10 object-contain"
+              />
+
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="shrink-0 border-white/20 bg-black/40 text-white hover:bg-white/10"
+                disabled={renderSlideIndex >= slideCount - 1}
+                onClick={() =>
+                  setRenderSlideIndex((index) =>
+                    Math.min(slideCount - 1, index + 1),
+                  )
+                }
+              >
+                <ChevronRight />
+                <span className="sr-only">Next slide</span>
+              </Button>
+            </div>
+
+            <p className="text-center text-xs text-zinc-500">
+              Arrow keys to navigate · Esc to close
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
