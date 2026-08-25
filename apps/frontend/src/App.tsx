@@ -263,9 +263,9 @@ export function App() {
   }
 
   return (
-    <div className="min-h-svh bg-[#1b1d21]">
+    <div className="min-h-svh overflow-x-hidden bg-[#1b1d21]">
       <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white text-zinc-950">
-        <div className="mx-auto flex h-14 max-w-[1200px] items-center px-4 sm:px-6">
+        <div className="mx-auto flex h-14 max-w-6xl items-center px-4 sm:px-6 lg:max-w-[1200px]">
           <a href={LINKS.home} className="flex items-center gap-2.5">
             <img src="/zerops-logo.png" alt="Zerops" className="size-8 object-contain" />
             <span className="text-sm font-semibold tracking-tight text-zinc-950">
@@ -275,23 +275,23 @@ export function App() {
         </div>
       </header>
 
-      <section className="px-4 pb-6 pt-14 text-center sm:px-6 sm:pt-16">
-        <h1 className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+      <section className="px-4 pb-4 pt-8 text-center sm:px-6 sm:pb-6 sm:pt-14 lg:pt-16">
+        <h1 className="text-balance text-2xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
           Turn your Markdown into a slide deck
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-sm text-zinc-400 sm:text-base">
+        <p className="mx-auto mt-2 max-w-2xl text-sm text-zinc-400 sm:mt-3 sm:text-base">
           Workers on Zerops render each section to PNG and PDF. The queue in
           this tab is live because the work is not.
         </p>
       </section>
 
-      <section className="mx-auto w-full max-w-[1200px] px-4 pb-16 sm:px-6">
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#111317] shadow-2xl">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-2.5">
-            <div className="flex items-center gap-3 text-sm text-zinc-400">
-              <span>Markdown → slides</span>
-              <span className="hidden h-4 w-px bg-white/10 sm:block" />
-              <span className="hidden items-center gap-1.5 sm:flex">
+      <section className="mx-auto w-full max-w-6xl px-4 pb-10 sm:pb-16 sm:px-6 lg:max-w-[1200px]">
+        <div className="overflow-hidden rounded-lg border border-white/10 bg-[#111317] shadow-2xl sm:rounded-xl">
+          <div className="flex flex-col gap-3 border-b border-white/10 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-2.5">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400 sm:gap-3">
+              <span className="text-xs sm:text-sm">Markdown → slides</span>
+              <span className="hidden h-4 w-px bg-white/10 md:block" />
+              <span className="hidden items-center gap-1.5 md:flex">
                 <Layers className="size-3.5 text-primary" />
                 <span className="tabular-nums text-primary">{depth}</span>
                 in flight
@@ -304,17 +304,19 @@ export function App() {
                       ? "default"
                       : "secondary"
                 }
+                className="text-xs"
               >
                 {phase}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
               {done && jobId ? (
                 <>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
+                    className="col-span-2 sm:col-span-1"
                     onClick={() => openRenderPreview(0)}
                   >
                     <Eye />
@@ -328,7 +330,8 @@ export function App() {
                     onClick={() => void downloadPdf()}
                   >
                     {exportingPdf ? <Loader2 className="animate-spin" /> : <Download />}
-                    Download PDF
+                    <span className="sm:hidden">PDF</span>
+                    <span className="hidden sm:inline">Download PDF</span>
                   </Button>
                   <Button
                     type="button"
@@ -338,7 +341,10 @@ export function App() {
                     onClick={() => void downloadPngs()}
                   >
                     {exportingPngs ? <Loader2 className="animate-spin" /> : <ImageDown />}
-                    {slideCount === 1 ? "Download PNG" : "Download PNGs"}
+                    <span className="sm:hidden">{slideCount === 1 ? "PNG" : "PNGs"}</span>
+                    <span className="hidden sm:inline">
+                      {slideCount === 1 ? "Download PNG" : "Download PNGs"}
+                    </span>
                   </Button>
                 </>
               ) : null}
@@ -354,14 +360,20 @@ export function App() {
                 <RotateCcw />
                 Reset
               </Button>
-              <Button type="button" size="sm" disabled={busy} onClick={() => void submit()}>
+              <Button
+                type="button"
+                size="sm"
+                className={cn(!done || !jobId ? "col-span-2 sm:col-span-1" : undefined)}
+                disabled={busy}
+                onClick={() => void submit()}
+              >
                 {busy ? <Loader2 className="animate-spin" /> : <Play />}
                 Create slides
               </Button>
             </div>
           </div>
 
-          <div className="flex border-b border-white/10 px-4">
+          <div className="grid grid-cols-2 border-b border-white/10">
             {(
               [
                 ["editor", "Editor"],
@@ -373,7 +385,7 @@ export function App() {
                 type="button"
                 onClick={() => setPanelTab(id)}
                 className={cn(
-                  "border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+                  "border-b-2 px-3 py-2.5 text-sm font-medium transition-colors sm:px-4",
                   panelTab === id
                     ? "border-primary text-white"
                     : "border-transparent text-zinc-500 hover:text-zinc-300",
@@ -384,23 +396,65 @@ export function App() {
             ))}
           </div>
 
-          <div className="min-h-[34rem]">
+          <div className="min-h-[min(80dvh,34rem)]">
             {panelTab === "editor" ? (
-              <>
-                <label className="sr-only" htmlFor="deck">
-                  Markdown deck
-                </label>
-                <Textarea
-                  id="deck"
-                  value={source}
-                  onChange={(event) => setSource(event.target.value)}
-                  spellCheck={false}
-                  placeholder="Paste or type Markdown here."
-                  className="min-h-[34rem] resize-none rounded-none border-0 bg-transparent px-5 py-4 font-mono text-[13px] leading-relaxed shadow-none focus-visible:ring-0"
-                />
-              </>
+              <div className="grid min-h-[min(80dvh,34rem)] md:grid-cols-2">
+                <div className="flex min-h-[min(40dvh,20rem)] flex-col border-b border-white/10 md:min-h-[min(80dvh,34rem)] md:border-b-0 md:border-r md:border-white/10">
+                  <label className="sr-only" htmlFor="deck">
+                    Markdown deck
+                  </label>
+                  <Textarea
+                    id="deck"
+                    value={source}
+                    onChange={(event) => setSource(event.target.value)}
+                    spellCheck={false}
+                    placeholder="Paste or type Markdown here."
+                    className="min-h-[min(40dvh,20rem)] flex-1 resize-none rounded-none border-0 bg-transparent px-4 py-3 font-mono text-xs leading-relaxed shadow-none focus-visible:ring-0 sm:px-5 sm:py-4 sm:text-[13px] md:min-h-[min(80dvh,34rem)]"
+                  />
+                </div>
+
+                <aside className="flex min-h-[min(40dvh,20rem)] flex-col p-3 sm:p-4 md:min-h-[min(80dvh,34rem)]">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-white">Live preview</h3>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 sm:size-7"
+                        disabled={previewIndex === 0}
+                        onClick={() => setPreviewIndex((i) => Math.max(0, i - 1))}
+                      >
+                        <ChevronLeft />
+                      </Button>
+                      <span className="min-w-10 text-center text-xs tabular-nums text-zinc-500 sm:min-w-12">
+                        {previewIndex + 1} / {drafts.length}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 sm:size-7"
+                        disabled={previewIndex >= drafts.length - 1}
+                        onClick={() =>
+                          setPreviewIndex((i) => Math.min(drafts.length - 1, i + 1))
+                        }
+                      >
+                        <ChevronRight />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="slide-prose mt-2 min-h-0 flex-1 overflow-auto rounded-md border border-white/10 bg-black/40 p-4 sm:mt-3 sm:p-6">
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: markdown.render(preview),
+                      }}
+                    />
+                  </div>
+                </aside>
+              </div>
             ) : (
-              <aside className="p-6 text-sm leading-relaxed text-zinc-300">
+              <aside className="p-4 text-sm leading-relaxed text-zinc-300 sm:p-6">
                 <h2 className="text-base font-semibold text-white">
                   Markdown → presentation
                 </h2>
@@ -429,7 +483,8 @@ export function App() {
                 </pre>
 
                 <h3 className="mt-6 font-semibold text-white">Markdown syntax</h3>
-                <table className="mt-2 w-full text-left text-xs">
+                <div className="-mx-1 overflow-x-auto px-1">
+                  <table className="mt-2 w-full min-w-[16rem] text-left text-xs">
                   <thead className="text-zinc-500">
                     <tr>
                       <th className="py-1 font-medium">Markdown</th>
@@ -458,14 +513,15 @@ export function App() {
                       </td>
                     </tr>
                   </tbody>
-                </table>
+                  </table>
+                </div>
 
                 {done && jobId ? (
                   <div className="mt-6 space-y-3">
                     <p className="text-zinc-400">
-                      Preview rendered slides in the toolbar, then download the PDF or PNGs.
+                      Rendered output — use Preview in the toolbar for full size, then download.
                     </p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                       {Array.from({ length: slideCount }, (_, index) => (
                         <button
                           key={index}
@@ -482,57 +538,17 @@ export function App() {
                       ))}
                     </div>
                   </div>
-                ) : (
-                  <div className="mt-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-white">Live preview</h3>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
-                          disabled={previewIndex === 0}
-                          onClick={() => setPreviewIndex((i) => Math.max(0, i - 1))}
-                        >
-                          <ChevronLeft />
-                        </Button>
-                        <span className="min-w-12 text-center text-xs tabular-nums text-zinc-500">
-                          {previewIndex + 1} / {drafts.length}
-                        </span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
-                          disabled={previewIndex >= drafts.length - 1}
-                          onClick={() =>
-                            setPreviewIndex((i) => Math.min(drafts.length - 1, i + 1))
-                          }
-                        >
-                          <ChevronRight />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="slide-prose mt-3 aspect-video overflow-auto rounded-md border border-white/10 bg-black/40 p-6">
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: markdown.render(preview),
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
+                ) : null}
               </aside>
             )}
           </div>
         </div>
       </section>
 
-      <section className="border-t border-white/10 bg-[#14161a] px-4 py-16 sm:px-6">
-        <div className="mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-2">
+      <section className="border-t border-white/10 bg-[#14161a] px-4 py-10 sm:px-6 sm:py-16">
+        <div className="mx-auto grid max-w-6xl gap-8 sm:gap-10 md:grid-cols-2 lg:max-w-[1200px]">
           <div>
-            <h2 className="text-xl font-semibold text-white">About this tool</h2>
+            <h2 className="text-lg font-semibold text-white sm:text-xl">About this tool</h2>
             <p className="mt-3 max-w-prose text-sm leading-relaxed text-zinc-400">
               Paste Markdown, split slides on <code className="text-zinc-200">---</code>,
               and send the job to workers running on{" "}
@@ -551,7 +567,7 @@ export function App() {
           <ol className="space-y-3 text-sm text-zinc-300">
             <li>
               <span className="font-medium text-white">1. Write slides</span>
-              <p className="text-zinc-400">Markdown in the editor tab.</p>
+              <p className="text-zinc-400">Markdown in the editor with live preview beside it.</p>
             </li>
             <li>
               <span className="font-medium text-white">2. Create the deck</span>
@@ -567,13 +583,13 @@ export function App() {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 px-4 py-10 sm:px-6">
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-8 sm:flex-row sm:justify-between">
+      <footer className="border-t border-white/10 px-4 py-8 sm:px-6 sm:py-10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:justify-between lg:max-w-[1200px]">
           <a href={LINKS.home} className="flex items-center gap-2">
             <img src="/zerops-logo.png" alt="" className="size-7 object-contain" />
             <span className="text-sm font-medium text-white">Zerops</span>
           </a>
-          <div className="grid grid-cols-2 gap-8 text-sm">
+          <div className="grid grid-cols-2 gap-6 text-sm sm:gap-8">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-zinc-500">Product</p>
               <a className="block text-zinc-300 hover:text-white" href={LINKS.home}>
@@ -601,14 +617,14 @@ export function App() {
 
       {renderPreviewOpen && jobId ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:p-8"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/90 p-0 sm:items-center sm:p-8"
           role="dialog"
           aria-modal="true"
           aria-label="Rendered slide preview"
           onClick={() => setRenderPreviewOpen(false)}
         >
           <div
-            className="flex w-full max-w-5xl flex-col gap-4"
+            className="flex max-h-[100dvh] w-full max-w-5xl flex-col gap-3 overflow-y-auto rounded-t-xl bg-[#111317] p-4 sm:gap-4 sm:rounded-none sm:bg-transparent sm:p-0"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between text-white">
@@ -622,7 +638,7 @@ export function App() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="text-white hover:bg-white/10"
+                className="size-9 text-white hover:bg-white/10 sm:size-8"
                 onClick={() => setRenderPreviewOpen(false)}
               >
                 <X />
@@ -630,12 +646,18 @@ export function App() {
               </Button>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-4">
+            <img
+              alt={`Slide ${renderSlideIndex + 1}`}
+              src={slideImageUrl(jobId, renderSlideIndex)}
+              className="max-h-[50dvh] w-full rounded-lg border border-white/10 object-contain sm:max-h-[65vh] lg:max-h-[70vh]"
+            />
+
+            <div className="flex items-center justify-between gap-2 sm:justify-center sm:gap-4">
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="shrink-0 border-white/20 bg-black/40 text-white hover:bg-white/10"
+                className="size-10 shrink-0 border-white/20 bg-black/40 text-white hover:bg-white/10 sm:size-9"
                 disabled={renderSlideIndex === 0}
                 onClick={() =>
                   setRenderSlideIndex((index) => Math.max(0, index - 1))
@@ -645,17 +667,18 @@ export function App() {
                 <span className="sr-only">Previous slide</span>
               </Button>
 
-              <img
-                alt={`Slide ${renderSlideIndex + 1}`}
-                src={slideImageUrl(jobId, renderSlideIndex)}
-                className="max-h-[70vh] w-full rounded-lg border border-white/10 object-contain"
-              />
+              <p className="text-center text-xs text-zinc-500 sm:hidden">
+                Swipe or use arrows · tap outside to close
+              </p>
+              <p className="hidden text-center text-xs text-zinc-500 sm:block">
+                Arrow keys to navigate · Esc to close
+              </p>
 
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="shrink-0 border-white/20 bg-black/40 text-white hover:bg-white/10"
+                className="size-10 shrink-0 border-white/20 bg-black/40 text-white hover:bg-white/10 sm:size-9"
                 disabled={renderSlideIndex >= slideCount - 1}
                 onClick={() =>
                   setRenderSlideIndex((index) =>
@@ -667,10 +690,6 @@ export function App() {
                 <span className="sr-only">Next slide</span>
               </Button>
             </div>
-
-            <p className="text-center text-xs text-zinc-500">
-              Arrow keys to navigate · Esc to close
-            </p>
           </div>
         </div>
       ) : null}
