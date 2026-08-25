@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import {
   createNatsBus,
   createPostgresStore,
@@ -19,12 +20,24 @@ if (!databaseUrl || !nats || !valkeyUrl) {
   );
 }
 
+const renderDriver =
+  process.env.RENDER_DRIVER === "chromium" ? "chromium" : "stub";
+
+if (renderDriver === "chromium") {
+  const chromePath = process.env.CHROMIUM_PATH;
+  if (!chromePath || !existsSync(chromePath)) {
+    throw new Error(
+      `WORKER requires a working CHROMIUM_PATH when RENDER_DRIVER=chromium (${chromePath ?? "unset"})`,
+    );
+  }
+} else if (process.env.NODE_ENV === "production") {
+  throw new Error("WORKER requires RENDER_DRIVER=chromium in production");
+}
+
 await migratePostgres(databaseUrl);
 const store = createPostgresStore(databaseUrl);
 const bus = await createNatsBus(nats);
 const cache = createValkeyCache(valkeyUrl);
-const renderDriver =
-  process.env.RENDER_DRIVER === "chromium" ? "chromium" : "stub";
 
 await bus.subscribe((jobId) =>
   handleJob({ store, cache, replicaId, renderDriver }, jobId),

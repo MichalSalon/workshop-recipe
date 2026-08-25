@@ -1,7 +1,7 @@
 import { splitSlides, type JobEvent } from "@deck/shared";
 import type { Cache } from "./cache.js";
 import { processLock, type JobLock } from "./lock.js";
-import { renderSlidePng, slidesToPdf, type RenderDriver } from "./render.js";
+import { renderAllSlides, slidesToPdf, type RenderDriver } from "./render.js";
 import type { Store } from "./store.js";
 
 export type HandleDeps = {
@@ -32,16 +32,9 @@ export async function handleJob(deps: HandleDeps, jobId: string): Promise<void> 
     }
     await deps.store.updateStatus(jobId, "rendering");
     const slides = splitSlides(job.markdown);
-    const pngs: Buffer[] = [];
-    for (const [index, source] of slides.entries()) {
-      const png = await renderSlidePng(
-        source,
-        index,
-        slides.length,
-        deps.renderDriver,
-        deps.spinMs ?? Number(process.env.RENDER_SPIN_MS ?? 400),
-      );
-      pngs.push(png);
+    const spinMs = deps.spinMs ?? Number(process.env.RENDER_SPIN_MS ?? 400);
+    const pngs = await renderAllSlides(slides, deps.renderDriver, spinMs);
+    for (const [index, png] of pngs.entries()) {
       const write = await deps.store.putSlide(jobId, index, png, deps.replicaId);
       if (write === "conflict") {
         const detail = `duplicate slide persist job=${jobId} replica=${deps.replicaId} index=${index}`;

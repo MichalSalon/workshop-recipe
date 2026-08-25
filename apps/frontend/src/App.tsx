@@ -3,7 +3,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  ExternalLink,
   ImageDown,
   Layers,
   Loader2,
@@ -29,7 +28,6 @@ const LINKS = {
   app: "https://app.zerops.io",
   docs: "https://docs.zerops.io",
   discord: "https://discord.gg/zeropsio",
-  github: "https://github.com/zeropsio/workshop-recipe",
   org: "https://github.com/zeropsio",
 } as const;
 
@@ -53,7 +51,7 @@ export function App() {
   const [note, setNote] = useState("Idle — submit a deck.");
   const [failed, setFailed] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [showGuide, setShowGuide] = useState(true);
+  const [panelTab, setPanelTab] = useState<"editor" | "instructions">("editor");
   const [previewIndex, setPreviewIndex] = useState(0);
 
   const drafts = useMemo(() => splitSlides(source), [source]);
@@ -67,24 +65,29 @@ export function App() {
     const socket = new WebSocket(wsUrl());
     socket.onmessage = (event) => {
       const msg = JSON.parse(event.data) as JobEvent;
-      if (msg.type === "queue.depth" || msg.type === "job.accepted") {
-        setDepth(msg.type === "job.accepted" ? msg.queueDepth : msg.depth);
+      if (msg.type === "queue.depth") {
+        setDepth(msg.depth);
+        return;
       }
       if (msg.type === "job.accepted") {
+        setDepth(msg.queueDepth);
         setJobId(msg.jobId);
         setSlideCount(msg.slideCount);
         setProgress(0);
         setDone(false);
         setFailed(false);
         setNote(`Accepted ${msg.jobId.slice(0, 8)}…`);
+        return;
       }
       if (msg.type === "job.progress") {
         setJobId(msg.jobId);
         setSlideCount(msg.total);
         setProgress(msg.current);
         setNote(`Slide ${msg.current} / ${msg.total}`);
+        return;
       }
       if (msg.type === "job.done") {
+        setJobId(msg.jobId);
         setDone(true);
         setBusy(false);
         setFailed(false);
@@ -94,6 +97,38 @@ export function App() {
     };
     return () => socket.close();
   }, []);
+
+  useEffect(() => {
+    if (!busy || !jobId || done || failed) return;
+    const poll = window.setInterval(() => {
+      void (async () => {
+        const res = await fetch(`${API}/api/jobs/${jobId}`);
+        if (!res.ok) return;
+        const body = (await res.json()) as {
+          status: string;
+          slideCount: number;
+          progress?: number;
+        };
+        if (body.progress !== undefined) {
+          setProgress(body.progress);
+          setSlideCount(body.slideCount);
+          setNote(`Slide ${body.progress} / ${body.slideCount}`);
+        }
+        if (body.status === "done") {
+          setDone(true);
+          setBusy(false);
+          setNote("Render complete.");
+          void refreshDepth();
+        }
+        if (body.status === "failed") {
+          setFailed(true);
+          setBusy(false);
+          setNote("Render failed.");
+        }
+      })();
+    }, 2000);
+    return () => window.clearInterval(poll);
+  }, [busy, jobId, done, failed]);
 
   useEffect(() => {
     void refreshDepth();
@@ -142,20 +177,42 @@ export function App() {
     setNote(`Queued ${body.id.slice(0, 8)}…`);
   }
 
+  function saveBlob(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function downloadPdf() {
+    if (!jobId) return;
+    setExporting(true);
+    try {
+      const res = await fetch(`${API}/api/jobs/${jobId}/pdf`);
+      if (!res.ok) throw new Error("pdf export failed");
+      saveBlob(await res.blob(), `${jobId.slice(0, 8)}.pdf`);
+    } catch {
+      setNote("PDF export failed.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   async function downloadPngs() {
     if (!jobId || !slideCount) return;
     setExporting(true);
     try {
       for (let index = 0; index < slideCount; index += 1) {
-        const res = await fetch(`${API}/api/jobs/${jobId}/slides/${index}`);
+        const res = await fetch(
+          `${API}/api/jobs/${jobId}/slides/${index}?download=1`,
+        );
         if (!res.ok) throw new Error("png export failed");
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `slide-${String(index + 1).padStart(2, "0")}.png`;
-        link.click();
-        URL.revokeObjectURL(url);
+        saveBlob(
+          await res.blob(),
+          `slide-${String(index + 1).padStart(2, "0")}.png`,
+        );
       }
     } catch {
       setNote("PNG export failed.");
@@ -167,22 +224,13 @@ export function App() {
   return (
     <div className="min-h-svh bg-[#1b1d21]">
       <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white text-zinc-950">
-        <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-4 sm:px-6">
+        <div className="mx-auto flex h-14 max-w-[1200px] items-center px-4 sm:px-6">
           <a href={LINKS.home} className="flex items-center gap-2.5">
             <img src="/zerops-logo.png" alt="Zerops" className="size-8 object-contain" />
             <span className="text-sm font-semibold tracking-tight text-zinc-950">
               Zerops
             </span>
           </a>
-          <Button
-            asChild
-            className="h-8 rounded-full bg-zinc-950 px-4 text-white hover:bg-zinc-800"
-          >
-            <a href={LINKS.app} target="_blank" rel="noreferrer">
-              Open Zerops
-              <ExternalLink />
-            </a>
-          </Button>
         </div>
       </header>
 
@@ -222,11 +270,15 @@ export function App() {
             <div className="flex flex-wrap items-center gap-2">
               {done && jobId ? (
                 <>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={`${API}/api/jobs/${jobId}/pdf`}>
-                      <Download />
-                      Download PDF
-                    </a>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={exporting}
+                    onClick={() => void downloadPdf()}
+                  >
+                    {exporting ? <Loader2 className="animate-spin" /> : <Download />}
+                    Download PDF
                   </Button>
                   <Button
                     type="button"
@@ -240,14 +292,6 @@ export function App() {
                   </Button>
                 </>
               ) : null}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setShowGuide((open) => !open)}
-              >
-                {showGuide ? "Hide instructions" : "Show instructions"}
-              </Button>
               <Button
                 type="button"
                 variant="outline"
@@ -267,26 +311,46 @@ export function App() {
             </div>
           </div>
 
-          <div
-            className={cn(
-              "grid min-h-[34rem]",
-              showGuide ? "lg:grid-cols-2" : "grid-cols-1",
-            )}
-          >
-            <label className="sr-only" htmlFor="deck">
-              Markdown deck
-            </label>
-            <Textarea
-              id="deck"
-              value={source}
-              onChange={(event) => setSource(event.target.value)}
-              spellCheck={false}
-              placeholder="Paste or type Markdown here."
-              className="min-h-[34rem] resize-none rounded-none border-0 bg-transparent px-5 py-4 font-mono text-[13px] leading-relaxed shadow-none focus-visible:ring-0"
-            />
+          <div className="flex border-b border-white/10 px-4">
+            {(
+              [
+                ["editor", "Editor"],
+                ["instructions", "Instructions"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setPanelTab(id)}
+                className={cn(
+                  "border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+                  panelTab === id
+                    ? "border-primary text-white"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
-            {showGuide ? (
-              <aside className="border-t border-white/10 p-6 text-sm leading-relaxed text-zinc-300 lg:border-l lg:border-t-0">
+          <div className="min-h-[34rem]">
+            {panelTab === "editor" ? (
+              <>
+                <label className="sr-only" htmlFor="deck">
+                  Markdown deck
+                </label>
+                <Textarea
+                  id="deck"
+                  value={source}
+                  onChange={(event) => setSource(event.target.value)}
+                  spellCheck={false}
+                  placeholder="Paste or type Markdown here."
+                  className="min-h-[34rem] resize-none rounded-none border-0 bg-transparent px-5 py-4 font-mono text-[13px] leading-relaxed shadow-none focus-visible:ring-0"
+                />
+              </>
+            ) : (
+              <aside className="p-6 text-sm leading-relaxed text-zinc-300">
                 <h2 className="text-base font-semibold text-white">
                   Markdown → presentation
                 </h2>
@@ -349,11 +413,15 @@ export function App() {
                 {done && jobId ? (
                   <div className="mt-6 space-y-3">
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={`${API}/api/jobs/${jobId}/pdf`}>
-                          <Download />
-                          Download PDF
-                        </a>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={exporting}
+                        onClick={() => void downloadPdf()}
+                      >
+                        {exporting ? <Loader2 className="animate-spin" /> : <Download />}
+                        Download PDF
                       </Button>
                       <Button
                         type="button"
@@ -425,7 +493,7 @@ export function App() {
                   </div>
                 )}
               </aside>
-            ) : null}
+            )}
           </div>
         </div>
       </section>
@@ -452,7 +520,7 @@ export function App() {
           <ol className="space-y-3 text-sm text-zinc-300">
             <li>
               <span className="font-medium text-white">1. Write slides</span>
-              <p className="text-zinc-400">Markdown in the editor on the left.</p>
+              <p className="text-zinc-400">Markdown in the editor tab.</p>
             </li>
             <li>
               <span className="font-medium text-white">2. Create the deck</span>
@@ -474,7 +542,7 @@ export function App() {
             <img src="/zerops-logo.png" alt="" className="size-7 object-contain" />
             <span className="text-sm font-medium text-white">Zerops</span>
           </a>
-          <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-8 text-sm">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-zinc-500">Product</p>
               <a className="block text-zinc-300 hover:text-white" href={LINKS.home}>
@@ -494,12 +562,6 @@ export function App() {
               </a>
               <a className="block text-zinc-300 hover:text-white" href={LINKS.org}>
                 GitHub
-              </a>
-            </div>
-            <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">This recipe</p>
-              <a className="block text-zinc-300 hover:text-white" href={LINKS.github}>
-                workshop-recipe
               </a>
             </div>
           </div>
