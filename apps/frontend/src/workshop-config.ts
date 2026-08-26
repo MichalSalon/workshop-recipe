@@ -18,7 +18,7 @@ export const WORKSHOP = {
 export const LINKS = {
   zerops: "https://zerops.io",
   app: "https://app.zerops.io",
-  /** Credit & Spend — top-up and coupon entry after signup. */
+  /** Credit & Spend — enter coupon during the verification top-up. */
   payment: "https://app.zerops.io/dashboard/finances",
   paymentDocs: "https://docs.zerops.io/company/payment",
   docs: "https://docs.zerops.io",
