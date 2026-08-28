@@ -7,9 +7,6 @@
 project:
   name: deck-renderer-ha-prod
   corePackage: SERIOUS
-  envVariables:
-    APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
-    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
 
 services:
   - hostname: frontend
@@ -23,17 +20,20 @@ services:
       minFreeRamGB: 0.25
 
   - hostname: api
-    type: nodejs@22
+    type: ubuntu/nodejs@22
     zeropsSetup: api
     buildFromGit: https://github.com/zeropsio/workshop-recipe
     enableSubdomainAccess: true
+    # Created before the SPA so ${api_zeropsSubdomain}
+    # already carries its -3000 port when the SPA builds.
+    priority: 5
     minContainers: 2
     verticalAutoscaling:
       minRam: 0.5
       minFreeRamGB: 0.25
 
   - hostname: worker
-    type: nodejs@22
+    type: ubuntu/nodejs@22
     zeropsSetup: worker
     buildFromGit: https://github.com/zeropsio/workshop-recipe
     minContainers: 2

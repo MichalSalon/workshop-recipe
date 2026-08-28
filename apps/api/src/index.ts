@@ -34,5 +34,11 @@ if (env.inlineWorker) {
   );
 }
 
-const app = await buildApp({ store, bus, cache, appUrl: env.appUrl });
+const app = await buildApp({
+  store,
+  bus,
+  cache,
+  appUrl: env.appUrl,
+  subdomainHost: env.subdomainHost,
+});
 await app.listen({ port: env.port, host: env.host });

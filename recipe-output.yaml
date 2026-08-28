@@ -13,7 +13,6 @@ files_created:
   - packages/engine/
   - tests/
   - recipes/deck-renderer/
-  - workshop/logs/
   - workshop/dev/
   - workshop/dev/import-app.yaml
   - workshop/prod/
@@ -29,15 +28,14 @@ strapi_fields:
 ready_for_testing: false
 notes:
   - GUI recipe is recipes/deck-renderer/ (all 6 envs). Conference projects
-    stay under workshop/ (logs / dev / prod).
+    stay under workshop/ (dev / prod).
   - Cover SVG reuses nodejs.svg from recipe-shared-assets — replace if a
     dedicated Deck Renderer cover is drawn.
   - Strapi registration still required before one-click deploy URLs work.
-  - Repo-root zerops.yaml setups: frontend, frontend-dev, api, api-dev,
-    worker, worker-dev, logquery. No Dockerfile.
+  - "Repo-root zerops.yaml setups: frontend, frontend-dev, api, api-dev,
+    worker, worker-dev. No Dockerfile."
   - workshop/prod zeropsSetup names match zerops.yaml.
-  - workshop/logs logquery uses zeropsSetup: logquery (no inline zeropsYaml).
   - buildFromGit URLs assume https://github.com/zeropsio/workshop-recipe.
-  - ELK pieces reuse zerops-recipe-apps elk-kibana-app and elk-logstash-app.
+  - Logs read from each project's own VictoriaLogs URL — no log project.
   - Local build + npm test only. No Zerops MCP in this session.
   - Not committed — awaiting review.

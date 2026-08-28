@@ -1,19 +1,28 @@
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/zerops-yaml-json-schema.json
 #
-# Monorepo pipeline — one file, six app setups + logquery.
+# Monorepo pipeline — one file, six app setups.
 # import.yaml zeropsSetup names must match these setup: keys.
-# Project value store (APP_URL, API_URL) is mapped here; do not
-# redeclare those keys under the same name (self-shadow).
+# Public URLs come from ${hostname_zeropsSubdomain}, which resolves to
+# https://{hostname}-{subdomainHost}-{port} with the project's own region
+# and declared port. Never hand-build them — a literal region is correct in
+# one project and wrong in every other.
+#
+# The reference is one-directional on purpose: frontend -> api only. The api
+# scopes CORS with the project-level ${zeropsSubdomainHost} instead of
+# referencing frontend, because mutual service refs cannot both resolve on a
+# single-pass import.
 
 zerops:
   # ── frontend (prod) ─────────────────────────────────────────
-  # Vite build on Node, Nginx runtime. VITE_* is baked in at
-  # build time from the project value store.
+  # Vite build on Node, Nginx runtime. VITE_* is baked in at build
+  # time. ${api_zeropsSubdomain} carries its -3000 suffix only once api
+  # has deployed once; on a first launch into an empty project, let api
+  # come up first, then re-release frontend.
   - setup: frontend
     build:
-      base: nodejs@22
+      base: ubuntu/nodejs@22
       envVariables:
-        VITE_API_URL: ${API_URL}
+        VITE_API_URL: ${api_zeropsSubdomain}
       buildCommands:
         - npm ci
         - npm run build -w @deck/frontend
@@ -29,30 +38,28 @@ zerops:
   # Full tree + Node so the agent can `npm run dev` over SSH.
   - setup: frontend-dev
     build:
-      base: nodejs@22
-      os: ubuntu
+      base: ubuntu/nodejs@22
       envVariables:
-        VITE_API_URL: ${DEV_API_URL}
+        VITE_API_URL: ${apidev_zeropsSubdomain}
       buildCommands:
         - npm install
       deployFiles: ./
       cache:
         - node_modules
     run:
-      base: nodejs@22
-      os: ubuntu
+      base: ubuntu/nodejs@22
       ports:
         - port: 5173
           httpSupport: true
       envVariables:
-        VITE_API_URL: ${DEV_API_URL}
+        VITE_API_URL: ${apidev_zeropsSubdomain}
       start: zsc noop --silent
 
   # ── api (prod) ──────────────────────────────────────────────
   # REST + WebSocket. Talks to db, queue, and cache by hostname.
   - setup: api
     build:
-      base: nodejs@22
+      base: ubuntu/nodejs@22
       buildCommands:
         - npm ci
       # Workspace packages are linked from the repo root — deploy
@@ -66,7 +73,7 @@ zerops:
           port: 3000
           path: /health
     run:
-      base: nodejs@22
+      base: ubuntu/nodejs@22
       # One migrator per deploy version. Worker also runs IF NOT
       # EXISTS on boot; execOnce keeps the first-deploy race off
       # the request path.
@@ -79,6 +86,11 @@ zerops:
         NODE_ENV: production
         PORT: "3000"
         HOST: 0.0.0.0
+        # CORS is scoped by the project's own subdomain host, a project-level
+        # value present from project creation. Referencing the frontend
+        # service here instead would deadlock: frontend's build needs
+        # ${api_zeropsSubdomain}, so api must be created first.
+        PROJECT_SUBDOMAIN_HOST: ${zeropsSubdomainHost}
         DATABASE_URL: ${db_connectionString}
         VALKEY_URL: ${cache_connectionString}
         # Discrete NATS fields — nats.js treats extra colons in a
@@ -96,16 +108,14 @@ zerops:
   # ── api-dev ─────────────────────────────────────────────────
   - setup: api-dev
     build:
-      base: nodejs@22
-      os: ubuntu
+      base: ubuntu/nodejs@22
       buildCommands:
         - npm install
       deployFiles: ./
       cache:
         - node_modules
     run:
-      base: nodejs@22
-      os: ubuntu
+      base: ubuntu/nodejs@22
       initCommands:
         - zsc execOnce ${appVersionId}-apidev-migrate --retryUntilSuccessful -- npm run migrate -w @deck/api
       ports:
@@ -115,8 +125,9 @@ zerops:
         NODE_ENV: development
         PORT: "3000"
         HOST: 0.0.0.0
-        # CORS origin for the Vite slot — value-store key, not a self-ref.
-        APP_URL: ${DEV_APP_URL}
+        # Same project-scope CORS host as the prod api — admits the Vite
+        # slot and the static SPA alike, in any region.
+        PROJECT_SUBDOMAIN_HOST: ${zeropsSubdomainHost}
         DATABASE_URL: ${db_connectionString}
         VALKEY_URL: ${cache_connectionString}
         NATS_HOST: ${queue_hostname}
@@ -130,15 +141,14 @@ zerops:
   # run.prepareCommands — that is why this is a system container.
   - setup: worker
     build:
-      base: nodejs@22
+      base: ubuntu/nodejs@22
       buildCommands:
         - npm ci
       deployFiles: ./
       cache:
         - node_modules
     run:
-      base: nodejs@22
-      os: ubuntu
+      base: ubuntu/nodejs@22
       # Ubuntu ships Chromium as a snap and fonts-noto-core only on
       # 24.04 — both 100 apt. Chrome is a real .deb Playwright can launch.
       prepareCommands:
@@ -162,16 +172,14 @@ zerops:
   # ── worker-dev ──────────────────────────────────────────────
   - setup: worker-dev
     build:
-      base: nodejs@22
-      os: ubuntu
+      base: ubuntu/nodejs@22
       buildCommands:
         - npm install
       deployFiles: ./
       cache:
         - node_modules
     run:
-      base: nodejs@22
-      os: ubuntu
+      base: ubuntu/nodejs@22
       prepareCommands:
         - sudo apt-get update
         - sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates fonts-liberation fonts-noto
@@ -189,28 +197,3 @@ zerops:
         NATS_USER: ${queue_user}
         NATS_PASSWORD: ${queue_password}
       start: zsc noop --silent
-
-  # ── logquery (workshop-logs only) ───────────────────────────
-  # Read-only HTTPS API. Token comes from the logs project store.
-  - setup: logquery
-    build:
-      base: nodejs@22
-      buildCommands:
-        - echo "logquery has no npm dependencies"
-      deployFiles:
-        - workshop/logs/logquery/~
-    run:
-      base: nodejs@22
-      ports:
-        - port: 3000
-          httpSupport: true
-      envVariables:
-        PORT: "3000"
-        HOST: 0.0.0.0
-        ELASTICSEARCH_URL: ${elkstorage_connectionString}
-        LOG_QUERY_TOKEN: ${LOG_QUERY_TOKEN}
-      start: node src/index.js
-      healthCheck:
-        httpGet:
-          port: 3000
-          path: /health

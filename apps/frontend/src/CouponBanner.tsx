@@ -65,11 +65,11 @@ export function CouponBanner({ embedded = false }: CouponBannerProps) {
             </div>
 
             <p className="max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg">
-              You already have an account. Open{" "}
-              <strong className="text-white">Credit &amp; Spend</strong>, start the $
-              {coupon.verificationPaymentUsd} verification top-up, and enter{" "}
-              <strong className="text-white">{coupon.code}</strong> in the coupon field before
-              you complete payment. The totals above are what lands in your account afterward.
+              You already have an account — open{" "}
+              <strong className="text-white">Credit &amp; Spend</strong>, top up $
+              {coupon.verificationPaymentUsd} (verification payment), and enter{" "}
+              <strong className="text-white">{coupon.code}</strong> in the coupon field on the
+              payment screen.
             </p>
           </div>
 

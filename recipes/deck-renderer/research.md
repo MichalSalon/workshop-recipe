@@ -3,7 +3,7 @@
 Canonical app repo: [zeropsio/workshop-recipe](https://github.com/zeropsio/workshop-recipe).
 Pipeline: repo-root `zerops.yaml`. Sibling: `zerops-showcase` + `vue-static-hello-world`.
 
-Conference-only projects (`workshop-logs` / `workshop-dev` / `workshop-prod`)
+Conference-only projects (`workshop-dev` / `workshop-prod`)
 live under `workshop/` in the app repo and are **not** these six GUI envs.
 
 ## Setups (`zerops.yaml`)
@@ -17,7 +17,7 @@ live under `workshop/` in the app repo and are **not** these six GUI envs.
 | `worker` | worker | `nodejs@22` + Chromium |
 | `worker-dev` | workerdev | `nodejs@22` + Chromium |
 
-Value store: `APP_URL`, `API_URL` (and `DEV_*` on agent/remote). Mapped in
+Public URLs resolve from `${hostname_zeropsSubdomain}`. Mapped in
 `zerops.yaml` — never as `envVariables` on import services.
 
 ## Scaling Considerations

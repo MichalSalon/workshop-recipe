@@ -1,7 +1,8 @@
 # Facilitator notes — do not give this file to the on-stage agent
 
 This repo is the pre-written Deck Renderer. The agent gets the app, a
-single-project `workshop-dev` token, and a read-only log-query credential.
+single-project `workshop-dev` token, and a read-only VictoriaLogs
+credential for that same project.
 
 ## Deliberate bug
 
@@ -13,7 +14,7 @@ Dedup lives in **worker process memory** (`packages/engine/src/lock.ts`), not Va
 | 5 | Duplicate renders, progress counters overshoot, occasional Postgres `23505` on `slides` |
 
 The API still returns **200** on submit. The frontend does not surface the
-conflict. Only **worker logs** (and the log-query API) show
+conflict. Only **worker logs** (via VictoriaLogs) show
 `acquired local render lock` from multiple replicas and
 `duplicate slide persist`.
 
@@ -29,15 +30,13 @@ workers to 5. A mocked laptop stack cannot.
 
 ## Demo beat
 
-1. Import `workshop/logs/import.yaml` weeks early. Load-test `logquery`.
-2. Import `workshop/dev/import.yaml` (zcp only). Put `LOG_QUERY_URL` +
-   `LOG_QUERY_TOKEN` on the zcp service. Confirm the agent can filter by
-   hostname (`worker`) before stage day.
-3. Agent provisions app services into workshop-dev (or import
+1. Import `workshop/dev/import.yaml` (zcp only). Confirm the agent can read
+   the project's logs and filter by hostname (`worker`) before stage day.
+2. Agent provisions app services into workshop-dev (or import
    `workshop/dev/import-app.yaml`). Pipeline is repo-root `zerops.yaml`.
-4. Submit a 3-slide deck with 1 worker — success.
-5. Scale workers to 5, submit the same deck again — duplicates in worker logs.
-6. Prod: import `workshop/prod/import.yaml`; CI deploys the same `zerops.yaml`.
+3. Submit a 3-slide deck with 1 worker — success.
+4. Scale workers to 5, submit the same deck again — duplicates in worker logs.
+5. Prod: import `workshop/prod/import.yaml`; CI deploys the same `zerops.yaml`.
    No zcp on prod. Replicas ≥ 3, HA on.
 
 ## What the agent is allowed to hold
@@ -45,7 +44,7 @@ workers to 5. A mocked laptop stack cannot.
 | Credential | Scope |
 |------------|--------|
 | ZCP / deploy token | `workshop-dev` only |
-| `LOG_QUERY_TOKEN` | Read-only logs, filter by hostname |
+| Logs | `workshop-dev` only, through the project's own log view |
 | Prod | None |
 
 ## Regression
