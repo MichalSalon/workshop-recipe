@@ -9,4 +9,4 @@ Local preview:
 npm run dev -w @deck/frontend
 ```
 
-Facilitator checklist: [`../PETRA.md`](../PETRA.md).
+Facilitator checklist: [`../FACILITATOR.md`](../FACILITATOR.md).

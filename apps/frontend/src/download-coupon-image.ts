@@ -30,9 +30,7 @@ function roundRect(
 
 export function downloadCouponImage(coupon: CouponImageInput): void {
   const width = 1200;
-  const height = 740;
-  const pad = 48;
-  const innerBottom = height - pad;
+  const height = 680;
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -46,12 +44,12 @@ export function downloadCouponImage(coupon: CouponImageInput): void {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = "rgba(94, 234, 212, 0.08)";
-  roundRect(ctx, pad, pad, width - pad * 2, height - pad * 2, 24);
+  roundRect(ctx, 48, 48, width - 96, height - 96, 24);
   ctx.fill();
 
   ctx.strokeStyle = "rgba(94, 234, 212, 0.35)";
   ctx.lineWidth = 3;
-  roundRect(ctx, pad, pad, width - pad * 2, height - pad * 2, 24);
+  roundRect(ctx, 48, 48, width - 96, height - 96, 24);
   ctx.stroke();
 
   ctx.fillStyle = "#5eead4";
@@ -64,10 +62,7 @@ export function downloadCouponImage(coupon: CouponImageInput): void {
 
   ctx.fillStyle = "#a1a1aa";
   ctx.font = "500 24px Inter, system-ui, sans-serif";
-  ctx.fillText("Enter during the $10 verification top-up", 96, 290);
-  ctx.fillStyle = "#71717a";
-  ctx.font = "500 20px Inter, system-ui, sans-serif";
-  ctx.fillText("Total credits after payment:", 96, 322);
+  ctx.fillText("Enter at payment — after your $10 verification top-up", 96, 290);
 
   ctx.fillStyle = "#71717a";
   ctx.font = "500 22px Inter, system-ui, sans-serif";
@@ -89,14 +84,12 @@ export function downloadCouponImage(coupon: CouponImageInput): void {
   ctx.fillStyle = "#d4d4d8";
   ctx.font = "400 22px Inter, system-ui, sans-serif";
   const lines = [
-    "Open Credit & Spend and start a $10 verification top-up.",
-    `Enter ${coupon.code} in the coupon field before you complete payment.`,
+    "You already have a Zerops account — open Credit & Spend, top up $10,",
+    `and enter ${coupon.code} in the coupon field on the payment screen.`,
     "app.zerops.io/dashboard/finances",
   ];
-  const lineHeight = 34;
-  const footerStartY = innerBottom - pad - (lines.length - 1) * lineHeight - 8;
   lines.forEach((line, index) => {
-    ctx.fillText(line, 96, footerStartY + index * lineHeight);
+    ctx.fillText(line, 96, 560 + index * 34);
   });
 
   canvas.toBlob((blob) => {

@@ -2,6 +2,7 @@ export type ApiEnv = {
   port: number;
   host: string;
   appUrl: string;
+  subdomainHost: string;
   databaseUrl: string;
   natsUrl: string;
   valkeyUrl: string;
@@ -19,6 +20,7 @@ export function readApiEnv(
     port: Number(env.PORT ?? 3000),
     host: env.HOST ?? "0.0.0.0",
     appUrl: env.APP_URL ?? "http://localhost:5173",
+    subdomainHost: env.PROJECT_SUBDOMAIN_HOST ?? "",
     databaseUrl,
     natsUrl,
     valkeyUrl,

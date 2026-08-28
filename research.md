@@ -2,7 +2,7 @@
 
 Workshop app for a live agent session: submit markdown, workers render slides
 to PNG/PDF, the browser shows queue depth and progress. Pipeline lives in
-repo-root `zerops.yaml` (frontend / api / worker / logquery + `*-dev`).
+repo-root `zerops.yaml` (frontend / api / worker + `*-dev`).
 No Dockerfile. Canonical imports stay under `workshop/`.
 
 - **Software:** Deck Renderer (this repo)
@@ -10,7 +10,7 @@ No Dockerfile. Canonical imports stay under `workshop/`.
 - **Official Site:** https://github.com/zeropsio/workshop-recipe
 - **Zerops Runtime:** `nodejs@22` (api, worker, frontend-dev) + `static` (frontend prod)
 - **Sibling recipes:** `zerops-showcase` (app + worker + NATS + Valkey + Postgres),
-  `vue-static-hello-world` (Vite SPA → Nginx), `elk` (central log stack)
+  `vue-static-hello-world` (Vite SPA → Nginx)
 
 ## Overview
 
@@ -43,9 +43,9 @@ No outbound HTTP from the worker. Render input is the submitted markdown only.
   `prepareCommands` — that is the contrast the workshop is built to show.
 - Playwright/Chromium needs ~0.5–1 GB RSS per render. Size the worker from that
   floor, not from a hello-world Node default.
-- Projects sit on separate VXLANs. The log stack is a **third** project;
-  the agent reaches it only through a public, authenticated, read-only query
-  URL — never `elkstorage` as a private hostname from `workshop-dev`.
+- Logs are read from each project's **own** VictoriaLogs URL, which is a
+  different endpoint and token per project. The agent holds the `workshop-dev`
+  pair only; there is no cross-project log service to reach.
 
 ## Build Configuration
 
@@ -107,21 +107,21 @@ node apps/worker/dist/index.js
 
 Refer to: https://docs.zerops.io/features/env-variables
 
-Project value store (import.yaml) uses generic names. Map in `zerops.yaml`.
+Public URLs are never stored in import.yaml. `zerops.yaml` resolves them
+from `${hostname_zeropsSubdomain}`, which carries the project's own region
+and the service's declared port.
 
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
 | `PORT` | api, frontend-dev | Bind port | `3000` / `5173` |
 | `HOST` | api | Bind address | `0.0.0.0` |
-| `APP_URL` | value store | Public frontend URL (CORS) | `https://frontend-….prg1.zerops.app` |
-| `API_URL` | value store | Public API URL (WS + REST) | `https://api-…-3000.prg1.zerops.app` |
+| `APP_URL` | api, api-dev | CORS origin — `${frontend_zeropsSubdomain}` | — |
+| `VITE_API_URL` | frontend build | API origin — `${api_zeropsSubdomain}` | — |
 | `DATABASE_URL` | api, worker | `${db_connectionString}` | — |
 | `NATS_HOST` / `PORT` / `USER` / `PASSWORD` | api, worker | Discrete NATS fields (password colons) | — |
 | `VALKEY_URL` | api, worker | `${cache_connectionString}` | — |
 | `WORKER_ID` | worker | Replica identity in logs | `${hostname}` or container id |
 | `RENDER_DRIVER` | worker | `chromium` on Zerops; `stub` in CI | `chromium` |
-| `LOG_QUERY_URL` | zcp only | Cross-project log API | `https://logquery-…` |
-| `LOG_QUERY_TOKEN` | zcp only | Read-only bearer | generated secret |
 
 ### Health Check
 
@@ -173,11 +173,10 @@ Per-setup RAM floors (hello-world / workshop, derived from what each process run
 | cache | profile only | — | never duplicate profile RAM |
 | queue | minRam only if above default | — | NATS is light |
 
-Cost ladder for the **three workshop projects** (not the six GUI recipe envs):
+Cost ladder for the **two workshop projects** (not the six GUI recipe envs):
 
 | Project | Shape | Notes |
 |---------|-------|-------|
-| `workshop-logs` | ELK + `logquery` | Static, load-tested weeks early |
 | `workshop-dev` | `zcp` at import; optional `import-app.yaml` | Agent can still provision, or import the app topology |
 | `workshop-prod` | Same app topology, HA, **no zcp** | Worker `minContainers: 3`; CI uses repo-root `zerops.yaml` |
 
@@ -209,14 +208,14 @@ correct; five replicas expose the process-local dedup lock (see
 |-------|-------|----------|
 | Worker cannot launch Chromium | Missing system packages | `prepareCommands` on Ubuntu runtime |
 | Duplicate slides / 23505 | Process-local lock + >1 replica | Distributed lock in Valkey |
-| Agent cannot read prod logs | Cross-project VXLAN | Use `LOG_QUERY_URL`, never private hostnames |
-| CORS / WS failure | `APP_URL` / `API_URL` unset | Map value store in `zerops.yaml` |
+| Agent cannot read prod logs | Prod VictoriaLogs is a different endpoint | By design — the agent holds the `workshop-dev` pair only |
+| CORS / WS failure | `APP_URL` / `VITE_API_URL` unset | Map `${hostname_zeropsSubdomain}` in `zerops.yaml` |
+| SPA calls a portless API URL | Built before `api` ever deployed | Let `api` come up first, then re-release `frontend` |
 
 ## Security Considerations
 
-- `LOG_QUERY_TOKEN` is read-only and scoped to the log project
 - The zcp token is a **single-project** deploy token for `workshop-dev` only
-- Neither credential reaches `workshop-prod`
+- Logs are read per project; nothing the agent holds reaches `workshop-prod`
 - Never commit `.env` / `.mcp.json`
 
 ## References
@@ -224,10 +223,9 @@ correct; five replicas expose the process-local dedup lock (see
 - https://docs.zerops.io/zerops-yaml/specification — pipeline in repo-root `zerops.yaml`
 - https://docs.zerops.io/references/import-yaml/type-list — service types
 - https://docs.zerops.io/features/scaling-ha — worker horizontal scale
-- https://docs.zerops.io/observability/log-forwarding — project logger → workshop-logs
+- https://docs.zerops.io/observability/logs — per-project VictoriaLogs endpoint
 - https://docs.zerops.io/features/coding-agents — zcp in-project vs prod without zcp
 - https://github.com/zeropsio/recipes/tree/main/zerops-showcase — sibling topology
-- https://github.com/zeropsio/recipes/tree/main/elk — log-stack sibling
 
 ## Notes for Terminal Agent
 
@@ -235,4 +233,4 @@ correct; five replicas expose the process-local dedup lock (see
 - Do **not** mention the scale bug in `AGENTS.md` or the app README.
 - Closest sibling: `zerops-showcase` + `vue-static-hello-world`.
 - Deviations from `/zerops-recipe-add` six-env template are intentional:
-  three named workshop projects (logs / dev / prod).
+  two named workshop projects (dev / prod).

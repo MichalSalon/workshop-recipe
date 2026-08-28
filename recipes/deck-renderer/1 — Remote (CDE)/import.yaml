@@ -1,19 +1,15 @@
 # yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/import-project-yaml-json-schema.json
 #
 # Remote CDE — same topology as the agent env without zcp. Developers
-# SSH into *dev hostnames. Value store maps in zerops.yaml.
+# SSH into *dev hostnames. Public URLs resolve from
+# ${hostname_zeropsSubdomain} in zerops.yaml.
 
 project:
   name: deck-renderer-remote
-  envVariables:
-    APP_URL: https://frontend-${zeropsSubdomainHost}.prg1.zerops.app
-    API_URL: https://api-${zeropsSubdomainHost}-3000.prg1.zerops.app
-    DEV_APP_URL: https://frontenddev-${zeropsSubdomainHost}-5173.prg1.zerops.app
-    DEV_API_URL: https://apidev-${zeropsSubdomainHost}-3000.prg1.zerops.app
 
 services:
   - hostname: frontenddev
-    type: nodejs@22
+    type: ubuntu/nodejs@22
     zeropsSetup: frontend-dev
     buildFromGit: https://github.com/zeropsio/workshop-recipe
     enableSubdomainAccess: true
@@ -21,20 +17,24 @@ services:
       minRam: 0.5
 
   - hostname: apidev
-    type: nodejs@22
+    type: ubuntu/nodejs@22
     zeropsSetup: api-dev
     buildFromGit: https://github.com/zeropsio/workshop-recipe
     enableSubdomainAccess: true
+    # Created before the SPA so ${apidev_zeropsSubdomain}
+    # already carries its -3000 port when the SPA builds.
+    priority: 5
     verticalAutoscaling:
       minRam: 0.5
 
   - hostname: workerdev
-    type: nodejs@22
+    type: ubuntu/nodejs@22
     zeropsSetup: worker-dev
     buildFromGit: https://github.com/zeropsio/workshop-recipe
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
+      minDisk: 2
 
   - hostname: frontend
     type: static
@@ -46,21 +46,25 @@ services:
       minFreeRamGB: 0.25
 
   - hostname: api
-    type: nodejs@22
+    type: ubuntu/nodejs@22
     zeropsSetup: api
     buildFromGit: https://github.com/zeropsio/workshop-recipe
     enableSubdomainAccess: true
+    # Created before the SPA so ${api_zeropsSubdomain}
+    # already carries its -3000 port when the SPA builds.
+    priority: 5
     verticalAutoscaling:
       minRam: 0.5
       minFreeRamGB: 0.25
 
   - hostname: worker
-    type: nodejs@22
+    type: ubuntu/nodejs@22
     zeropsSetup: worker
     buildFromGit: https://github.com/zeropsio/workshop-recipe
     verticalAutoscaling:
       minRam: 1
       minFreeRamGB: 0.5
+      minDisk: 2
 
   - hostname: db
     type: postgresql:single@17

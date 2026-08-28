@@ -15,11 +15,26 @@ export type AppDeps = {
   bus: Bus;
   cache: Cache;
   appUrl: string;
+  // Project-scope subdomain host. Every public URL in the project contains
+  // it, so matching on it admits the SPA from whichever region the project
+  // runs in — without naming a region or referencing the frontend service.
+  subdomainHost?: string;
 };
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function corsOrigins(deps: AppDeps): (string | RegExp)[] {
+  const origins: (string | RegExp)[] = [deps.appUrl, /localhost/];
+  const host = deps.subdomainHost?.trim();
+  if (host) origins.push(new RegExp(escapeRegExp(host)));
+  return origins;
+}
 
 export async function buildApp(deps: AppDeps) {
   const app = Fastify({ logger: false });
-  await app.register(cors, { origin: [deps.appUrl, /localhost/] });
+  await app.register(cors, { origin: corsOrigins(deps) });
   await app.register(websocket);
 
   const sockets = new Set<{ send: (raw: string) => void }>();
