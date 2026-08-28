@@ -1,0 +1,165 @@
+import devResources from "@/config/resources-dev.json";
+import prodResources from "@/config/resources-prod.json";
+import {
+  formatResourceNumber,
+  monthlyResourceCost,
+  sumResources,
+  type MonthlyCost,
+  type ResourceTotals,
+} from "@/lib/zerops-pricing";
+import type { RecipeServiceConfig, ResourceStackConfig } from "@/lib/diagram-types";
+
+export type { RecipeServiceConfig, ResourceStackConfig };
+export const DEV_RESOURCE_CONFIG = devResources as ResourceStackConfig;
+export const PROD_RESOURCE_CONFIG = prodResources as ResourceStackConfig;
+
+export type ResourceAnalysis = {
+  totals: ResourceTotals;
+  cost: MonthlyCost;
+  oversizedServices: RecipeServiceConfig[];
+  recommendedTotals: ResourceTotals;
+  recommendedCost: MonthlyCost;
+  monthlySavings: number;
+};
+
+function resourceSlice(service: RecipeServiceConfig, useBaseline: boolean): ResourceTotals {
+  if (service.category === "OBJECT_STORAGE") {
+    return { cpu: 0, ram: 0, disc: 0, storage: service.objectStorageSize ?? 0 };
+  }
+
+  const min = useBaseline && service.recipeBaseline
+    ? service.recipeBaseline.minResource
+    : service.autoscaling?.verticalAutoscaling?.minResource;
+
+  return {
+    cpu: min?.cpuCoreCount ?? 0,
+    ram: min?.memoryGBytes ?? 0,
+    disc: min?.diskGBytes ?? 0,
+    storage: 0,
+  };
+}
+
+function containersForService(service: RecipeServiceConfig, useBaseline: boolean): number {
+  if (useBaseline && service.recipeBaseline) {
+    return service.recipeBaseline.minContainerCount;
+  }
+  return service.autoscaling?.horizontalAutoscaling?.minContainerCount ?? 1;
+}
+
+function serviceTotals(services: RecipeServiceConfig[], useBaseline = false): ResourceTotals {
+  return sumResources(
+    services.map((service) => ({
+      resources: resourceSlice(service, useBaseline),
+      containers: containersForService(service, useBaseline),
+    })),
+  );
+}
+
+export function containerCount(service: RecipeServiceConfig): number {
+  return containersForService(service, false);
+}
+
+/** Short label for diagram cards — e.g. "3→1 replicas, minRam 1→0.5 GB". */
+export function describeOversizedFix(service: RecipeServiceConfig): string {
+  if (!service.oversizedInDev || !service.recipeBaseline?.minResource || !service.autoscaling) {
+    return "";
+  }
+
+  const parts: string[] = [];
+  const currentContainers = service.autoscaling.horizontalAutoscaling.minContainerCount;
+  const targetContainers = service.recipeBaseline.minContainerCount;
+  if (currentContainers > targetContainers) {
+    parts.push(`${currentContainers}→${targetContainers} replica${targetContainers === 1 ? "" : "s"}`);
+  }
+
+  const currentRam = service.autoscaling.verticalAutoscaling.minResource.memoryGBytes;
+  const targetRam = service.recipeBaseline.minResource.memoryGBytes;
+  if (currentRam > targetRam) {
+    parts.push(`minRam ${formatResourceNumber(currentRam)}→${formatResourceNumber(targetRam)} GB`);
+  }
+
+  if (service.name === "db") {
+    parts.push("postgresql:single@17 + oltp-hobby");
+  }
+
+  return parts.join(", ");
+}
+
+export type OversizedFixGroup = {
+  hostnames: string;
+  steps: string[];
+};
+
+/** Actionable fix list for the workshop banner. */
+export function oversizedFixGroups(services: RecipeServiceConfig[]): OversizedFixGroup[] {
+  const oversized = services.filter((service) => service.oversizedInDev);
+  if (oversized.length === 0) return [];
+
+  const appSlots = oversized.filter((service) =>
+    ["frontend", "api", "worker"].includes(service.name),
+  );
+  const db = oversized.find((service) => service.name === "db");
+
+  const groups: OversizedFixGroup[] = [];
+
+  if (appSlots.length > 0) {
+    groups.push({
+      hostnames: appSlots.map((service) => service.name).join(", "),
+      steps: [
+        "In workshop/dev/import-app.yaml: remove minContainers: 3 (default is 1).",
+        "Set minRam to the AI Agent recipe values (frontend 0.25, api 0.5, worker 1).",
+      ],
+    });
+  }
+
+  if (db) {
+    groups.push({
+      hostnames: "db",
+      steps: [
+        "Replace postgresql:ha@17 + profile oltp-staging with postgresql:single@17 + profile oltp-hobby.",
+        `Right now: ${containerCount(db)} Postgres nodes; recipe needs 1.`,
+      ],
+    });
+  }
+
+  groups.push({
+    hostnames: "resources-dev.json",
+    steps: [
+      "Update apps/frontend/src/config/resources-dev.json to match — the amber warning clears when allocations align.",
+    ],
+  });
+
+  return groups;
+}
+
+export function displayServices(config: ResourceStackConfig): RecipeServiceConfig[] {
+  return config.services.filter((service) => service.category !== "CORE");
+}
+
+export function analyzeResourceConfig(config: ResourceStackConfig): ResourceAnalysis {
+  const services = displayServices(config);
+  const totals = serviceTotals(services);
+  const cost = monthlyResourceCost(totals);
+  const oversizedServices = services.filter((service) => service.oversizedInDev);
+  const recommendedTotals = serviceTotals(services, true);
+  const recommendedCost = monthlyResourceCost(recommendedTotals);
+
+  return {
+    totals,
+    cost,
+    oversizedServices,
+    recommendedTotals,
+    recommendedCost,
+    monthlySavings: cost.total - recommendedCost.total,
+  };
+}
+
+export function workshopEnv(): "dev" | "prod" {
+  const env = import.meta.env.VITE_WORKSHOP_ENV;
+  if (env === "dev" || env === "prod") return env;
+  return import.meta.env.DEV ? "dev" : "prod";
+}
+
+export function activeResourceConfig(): ResourceStackConfig {
+  return workshopEnv() === "dev" ? DEV_RESOURCE_CONFIG : PROD_RESOURCE_CONFIG;
+}

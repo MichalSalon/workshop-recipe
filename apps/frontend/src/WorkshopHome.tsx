@@ -19,6 +19,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ResourceOverprovisionBanner } from "@/components/ResourceOverprovisionBanner";
+import { ResourcesDiagram } from "@/components/ResourcesDiagram";
+import {
+  activeResourceConfig,
+  analyzeResourceConfig,
+  workshopEnv,
+} from "@/lib/workshop-resources";
 import { AGENDA, LINKS, STACK, WORKSHOP } from "@/workshop-config";
 
 const PILLS = [
@@ -34,6 +41,10 @@ type WorkshopHomeProps = {
 };
 
 export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
+  const resourceConfig = activeResourceConfig();
+  const resourceAnalysis = analyzeResourceConfig(resourceConfig);
+  const isDevProject = workshopEnv() === "dev";
+
   return (
     <div className="relative min-h-svh overflow-x-hidden bg-[#12141a] text-white">
       <div
@@ -160,6 +171,34 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        <section className="border-y border-white/10 bg-[#0f1115]/80 px-4 py-14 sm:px-6 sm:py-16">
+          <div className="mx-auto max-w-6xl lg:max-w-5xl">
+            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">My resources</h2>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-400 sm:text-base">
+              Live allocation for this project — same layout as the Zerops recipe resources
+              diagram, with monthly cost from platform pricing.
+              {isDevProject && resourceAnalysis.oversizedServices.length > 0 ? (
+                <>
+                  {" "}
+                  Orange <strong className="font-medium text-amber-300/90">TOO BIG</strong> cards
+                  show what to right-size in{" "}
+                  <span className="font-mono text-xs text-zinc-300">import-app.yaml</span>.
+                </>
+              ) : null}
+            </p>
+
+            {isDevProject ? (
+              <div className="mt-6">
+                <ResourceOverprovisionBanner analysis={resourceAnalysis} />
+              </div>
+            ) : null}
+
+            <div className="mt-8 rounded-xl border border-white/10 bg-[#161922]/60 p-4 sm:p-6">
+              <ResourcesDiagram config={resourceConfig} highlightOversized={isDevProject} />
+            </div>
           </div>
         </section>
 

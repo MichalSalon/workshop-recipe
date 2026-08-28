@@ -23,6 +23,7 @@ zerops:
       base: ubuntu/nodejs@22
       envVariables:
         VITE_API_URL: ${api_zeropsSubdomain}
+        VITE_WORKSHOP_ENV: prod
       buildCommands:
         - npm ci
         - npm run build -w @deck/frontend
@@ -41,6 +42,7 @@ zerops:
       base: ubuntu/nodejs@22
       envVariables:
         VITE_API_URL: ${apidev_zeropsSubdomain}
+        VITE_WORKSHOP_ENV: dev
       buildCommands:
         - npm install
       deployFiles: ./
@@ -53,6 +55,7 @@ zerops:
           httpSupport: true
       envVariables:
         VITE_API_URL: ${apidev_zeropsSubdomain}
+        VITE_WORKSHOP_ENV: dev
       start: zsc noop --silent
 
   # ── api (prod) ──────────────────────────────────────────────

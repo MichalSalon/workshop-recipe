@@ -12,8 +12,9 @@ Replace the `REPLACE_*` placeholders in `import.yaml` with this project's
 own VictoriaLogs URL and read-only token before import, or set them in the
 GUI after.
 
-Optional: import `import-app.yaml` into this project to pre-create
-frontend / api / worker (dev + prod setups) plus db, cache, and queue.
+Optional: import `import-app.yaml` into this project to pre-create the full
+AI Agent topology (dev + prod slots, db, cache, queue). Prod slots are
+required; import intentionally oversizes them for workshop prompt #1.
 
 Confirm the agent can query logs **before** stage day:
 
