@@ -88,7 +88,7 @@
       "ports": [],
       "oversizedInDev": true,
       "recipeBaseline": {
-        "minResource": { "cpuCoreCount": 0.25, "memoryGBytes": 0.25, "diskGBytes": 1 },
+        "minResource": { "cpuCoreCount": 0.25, "memoryGBytes": 0.5, "diskGBytes": 1 },
         "minContainerCount": 1
       },
       "autoscaling": {
@@ -117,7 +117,7 @@
       "ports": [{ "protocol": "TCP", "port": 3000, "description": "", "scheme": "http" }],
       "oversizedInDev": true,
       "recipeBaseline": {
-        "minResource": { "cpuCoreCount": 0.25, "memoryGBytes": 0.5, "diskGBytes": 1 },
+        "minResource": { "cpuCoreCount": 0.25, "memoryGBytes": 1, "diskGBytes": 1 },
         "minContainerCount": 1
       },
       "autoscaling": {
@@ -146,7 +146,7 @@
       "ports": [],
       "oversizedInDev": true,
       "recipeBaseline": {
-        "minResource": { "cpuCoreCount": 0.25, "memoryGBytes": 1, "diskGBytes": 2 },
+        "minResource": { "cpuCoreCount": 0.25, "memoryGBytes": 2, "diskGBytes": 2 },
         "minContainerCount": 1
       },
       "autoscaling": {
@@ -173,11 +173,6 @@
       "content": "",
       "zeropsYaml": "",
       "ports": [],
-      "oversizedInDev": true,
-      "recipeBaseline": {
-        "minResource": { "cpuCoreCount": 0.5, "memoryGBytes": 1, "diskGBytes": 10 },
-        "minContainerCount": 1
-      },
       "autoscaling": {
         "verticalAutoscaling": {
           "minResource": { "cpuCoreCount": 0.5, "memoryGBytes": 2, "diskGBytes": 20 },

@@ -6,11 +6,7 @@ import {
   sumResources,
 } from "@/lib/zerops-pricing";
 import type { RecipeServiceConfig, ResourceStackConfig } from "@/lib/diagram-types";
-import {
-  containerCount,
-  describeOversizedFix,
-  displayServices,
-} from "@/lib/workshop-resources";
+import { containerCount, displayServices } from "@/lib/workshop-resources";
 
 const COLORS = {
   coreBg: "#082335",
@@ -29,7 +25,6 @@ const COLORS = {
   sumIcon: "rgba(159, 174, 169, 0.35)",
   badgeBg: "#f59e0b",
   badgeText: "#451a03",
-  fixHint: "#fbbf24",
 } as const;
 
 const FONT = "Inter, system-ui, sans-serif";
@@ -60,16 +55,16 @@ function gridCols(count: number, width: number): number {
 
 function computeLayout(width: number, serviceCount: number): Layout {
   const pad = 24;
-  const gap = 12;
+  const gap = 14;
   const cols = gridCols(serviceCount, width);
   const coreW = Math.min(270, width - pad * 2);
   const cardW = Math.floor((width - pad * 2 - gap * (cols - 1)) / cols);
-  const cardH = cardW >= 300 ? 142 : 156;
+  const cardH = cardW >= 300 ? 132 : 144;
   const rows = Math.ceil(serviceCount / cols);
   const coreBlock = 96;
   const gridH = rows * cardH + Math.max(0, rows - 1) * gap;
-  const footer = width >= 640 ? 132 : 176;
-  const height = pad + coreBlock + 20 + gridH + 28 + footer + pad;
+  const footer = width >= 640 ? 118 : 160;
+  const height = pad + coreBlock + 24 + gridH + 32 + footer + pad;
   return { height, pad, coreW, cols, cardW, cardH, gap };
 }
 
@@ -96,7 +91,7 @@ function roundRect(
 
 function drawStackedMetric(
   ctx: CanvasRenderingContext2D,
-  x: number,
+  centerX: number,
   y: number,
   colWidth: number,
   value: string,
@@ -104,37 +99,50 @@ function drawStackedMetric(
   valueSize: number,
   unit?: string,
 ) {
-  ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
 
   ctx.font = `700 ${valueSize}px ${FONT}`;
   ctx.fillStyle = COLORS.resourceNum;
-  ctx.fillText(value, x, y);
+  const valueW = ctx.measureText(value).width;
+  let unitW = 0;
+  if (unit) {
+    ctx.font = `500 ${Math.round(valueSize * 0.85)}px ${FONT}`;
+    unitW = ctx.measureText(unit).width;
+  }
+  const lineW = valueW + (unit ? 3 + unitW : 0);
+  const lineX = centerX - lineW / 2;
+
+  ctx.textAlign = "left";
+  ctx.font = `700 ${valueSize}px ${FONT}`;
+  ctx.fillStyle = COLORS.resourceNum;
+  ctx.fillText(value, lineX, y);
 
   if (unit) {
-    const unitX = x + ctx.measureText(value).width + 3;
     ctx.font = `500 ${Math.round(valueSize * 0.85)}px ${FONT}`;
     ctx.fillStyle = COLORS.resourceUnit;
-    ctx.fillText(unit, unitX, y);
+    ctx.fillText(unit, lineX + valueW + 3, y);
   }
 
-  ctx.font = `500 ${Math.round(valueSize * 0.75)}px ${FONT}`;
+  ctx.font = `500 ${Math.max(9, Math.round(valueSize * 0.72))}px ${FONT}`;
   ctx.fillStyle = COLORS.resourceLabel;
+  ctx.textAlign = "center";
 
   const words = label.split(" ");
   let line = "";
-  let lineY = y + 14;
+  let lineY = y + 15;
   for (const word of words) {
     const test = line ? `${line} ${word}` : word;
-    if (ctx.measureText(test).width > colWidth - 2 && line) {
-      ctx.fillText(line, x, lineY);
+    if (ctx.measureText(test).width > colWidth - 4 && line) {
+      ctx.fillText(line, centerX, lineY);
       line = word;
-      lineY += 12;
+      lineY += 11;
     } else {
       line = test;
     }
   }
-  if (line) ctx.fillText(line, x, lineY);
+  if (line) ctx.fillText(line, centerX, lineY);
+
+  ctx.textAlign = "left";
 }
 
 function drawMetricColumns(
@@ -149,7 +157,7 @@ function drawMetricColumns(
   metrics.forEach((metric, index) => {
     drawStackedMetric(
       ctx,
-      x + colWidth * index,
+      x + colWidth * index + colWidth / 2,
       y,
       colWidth,
       metric.value,
@@ -204,6 +212,22 @@ function serviceHostname(service: RecipeServiceConfig): string {
   return text;
 }
 
+function drawFlaggedBadge(ctx: CanvasRenderingContext2D, x: number, y: number, width: number) {
+  const badge = "TOO BIG";
+  ctx.font = `600 9px ${FONT}`;
+  const badgeW = ctx.measureText(badge).width + 12;
+  const badgeX = x + width - badgeW - 10;
+  const badgeY = y + 10;
+
+  roundRect(ctx, badgeX, badgeY, badgeW, 16, 4);
+  ctx.fillStyle = COLORS.badgeBg;
+  ctx.fill();
+  ctx.fillStyle = COLORS.badgeText;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(badge, badgeX + 6, badgeY + 11);
+}
+
 function drawServiceCard(
   ctx: CanvasRenderingContext2D,
   service: RecipeServiceConfig,
@@ -221,23 +245,25 @@ function drawServiceCard(
     ctx.lineWidth = 1;
     roundRect(ctx, x, y, width, height, 6);
     ctx.stroke();
-    ctx.font = `600 8px ${FONT}`;
-    const badge = "TOO BIG";
-    const badgeW = ctx.measureText(badge).width + 10;
-    roundRect(ctx, x + 8, y - 6, badgeW, 14, 3);
-    ctx.fillStyle = COLORS.badgeBg;
-    ctx.fill();
-    ctx.fillStyle = COLORS.badgeText;
-    ctx.fillText(badge, x + 13, y + 4);
+    drawFlaggedBadge(ctx, x, y, width);
   }
 
-  const innerX = x + 12;
-  const innerW = width - 24;
+  const innerX = x + 14;
+  const innerW = width - 28;
+  const headerY = y + 24;
+  const hostname = serviceHostname(service);
 
   ctx.font = `700 15px ${FONT}`;
   ctx.fillStyle = COLORS.hostname;
   ctx.textAlign = "left";
-  ctx.fillText(serviceHostname(service), innerX, y + 22);
+  ctx.textBaseline = "alphabetic";
+
+  const hostnameMaxW = flagged ? innerW - 58 : innerW;
+  const hostnameText =
+    ctx.measureText(hostname).width > hostnameMaxW
+      ? `${hostname.slice(0, Math.max(8, Math.floor(hostnameMaxW / 8)))}…`
+      : hostname;
+  ctx.fillText(hostnameText, innerX, headerY);
 
   ctx.font = `500 12px ${FONT}`;
   ctx.fillStyle = COLORS.type;
@@ -245,21 +271,8 @@ function drawServiceCard(
   ctx.fillText(
     ctx.measureText(typeLine).width > innerW ? `${typeLine.slice(0, 18)}…` : typeLine,
     innerX,
-    y + 40,
+    headerY + 18,
   );
-
-  let metricsY = y + 68;
-  if (flagged) {
-    const fixHint = describeOversizedFix(service);
-    if (fixHint) {
-      ctx.font = `600 10px ${FONT}`;
-      ctx.fillStyle = COLORS.fixHint;
-      const hint =
-        ctx.measureText(fixHint).width > innerW ? `${fixHint.slice(0, Math.max(20, innerW / 5))}…` : fixHint;
-      ctx.fillText(`Fix: ${hint}`, innerX, y + 56);
-      metricsY = y + 78;
-    }
-  }
 
   const min = service.autoscaling?.verticalAutoscaling?.minResource;
   const cpuMode = service.autoscaling?.verticalAutoscaling?.cpuMode ?? "SHARED";
@@ -268,11 +281,14 @@ function drawServiceCard(
 
   if (!min) return;
 
-  drawContainerBlock(ctx, innerX, metricsY, containers, metricSize);
+  const containersY = headerY + 40;
+  const metricsY = containersY + 26;
+
+  drawContainerBlock(ctx, innerX, containersY, containers, metricSize);
   drawMetricColumns(
     ctx,
     innerX,
-    metricsY + 20,
+    metricsY,
     innerW,
     [
       {
@@ -337,14 +353,13 @@ function drawCoreBlock(
   ctx.textAlign = "left";
 }
 
-function drawPriceBlock(
+function drawPriceAmount(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   amount: number,
   decimal: string,
-  align: "left" | "right" = "left",
-) {
+): number {
   const amountText = String(amount);
   const decimalText = `.${decimal}`;
 
@@ -355,41 +370,25 @@ function drawPriceBlock(
   const symbolW = ctx.measureText("$").width;
   const amountW = ctx.measureText(amountText).width;
 
-  ctx.font = `500 16px ${FONT}`;
-  const decimalW = ctx.measureText(decimalText).width;
-
-  const lineW = symbolW + 2 + amountW + decimalW;
-  const startX = align === "right" ? x - lineW : x;
-
-  ctx.font = `700 24px ${FONT}`;
   ctx.fillStyle = COLORS.price;
   ctx.globalAlpha = 0.4;
-  ctx.fillText("$", startX, y);
+  ctx.fillText("$", x, y);
   ctx.globalAlpha = 1;
-  ctx.fillText(amountText, startX + symbolW + 2, y);
+  ctx.fillText(amountText, x + symbolW + 2, y);
 
   ctx.font = `500 16px ${FONT}`;
   ctx.globalAlpha = 0.5;
-  ctx.fillText(decimalText, startX + symbolW + 2 + amountW + 2, y);
+  ctx.fillText(decimalText, x + symbolW + 2 + amountW + 2, y);
   ctx.globalAlpha = 1;
 
-  ctx.font = `500 12px ${FONT}`;
-  ctx.fillStyle = COLORS.resourceLabel;
-  ctx.globalAlpha = 0.5;
-  const subtitleX = align === "right" ? x - lineW : startX;
-  ctx.textAlign = "left";
-  ctx.fillText("Per month", subtitleX, y + 20);
-  ctx.fillText("for", subtitleX, y + 34);
-  ctx.fillText("Resources cost", subtitleX, y + 48);
-  ctx.globalAlpha = 1;
+  return x + symbolW + 2 + amountW + ctx.measureText(decimalText).width + 2;
 }
 
-function drawAddonBlock(
+function drawAddonAmount(
   ctx: CanvasRenderingContext2D,
   rightX: number,
   y: number,
   packagePrice: number,
-  packageName: string,
 ) {
   ctx.textAlign = "right";
   ctx.textBaseline = "alphabetic";
@@ -403,11 +402,27 @@ function drawAddonBlock(
     ctx.fillText(`$${packagePrice}.00`, rightX, y);
   }
 
-  ctx.font = `500 12px ${FONT}`;
+  ctx.textAlign = "left";
+}
+
+function drawFooterCaption(
+  ctx: CanvasRenderingContext2D,
+  lines: string[],
+  x: number,
+  y: number,
+  maxWidth: number,
+  align: "left" | "right",
+) {
+  ctx.font = `500 10px ${FONT}`;
   ctx.fillStyle = COLORS.resourceLabel;
-  ctx.globalAlpha = 0.5;
-  ctx.fillText("Per month for", rightX, y + 20);
-  ctx.fillText(`${packageName} pkg.`, rightX, y + 34);
+  ctx.globalAlpha = 0.55;
+  ctx.textAlign = align;
+  ctx.textBaseline = "alphabetic";
+
+  lines.forEach((line, index) => {
+    ctx.fillText(line, x, y + index * 13);
+  });
+
   ctx.globalAlpha = 1;
   ctx.textAlign = "left";
 }
@@ -462,48 +477,74 @@ function drawFooter(
   ];
 
   const rowY = y + 32;
+  const captionY = rowY + 30;
   const gridLeft = pad;
   const gridRight = width - pad;
   const gridW = gridRight - gridLeft;
 
   if (gridW >= 520) {
-    const resourcesColW = Math.floor((gridW * 8) / 12);
-    const addonsColW = gridW - resourcesColW;
-    const innerGap = 14;
-    const sigmaW = 30;
-    const priceColW = 120;
-    const totalsW = resourcesColW - sigmaW - priceColW - innerGap * 2;
-    const sigmaX = gridLeft + totalsW + innerGap;
-    const priceX = sigmaX + sigmaW + innerGap;
+    const totalsW = Math.floor(gridW * 0.44);
+    const sigmaW = 22;
+    const gap = 12;
+    const priceW = 96;
+    const totalsX = gridLeft;
+    const sigmaX = totalsX + totalsW + gap;
+    const priceX = sigmaX + sigmaW + gap;
+    const plusX = priceX + priceW + 4;
+    const addonX = gridRight;
 
-    drawMetricColumns(ctx, gridLeft, rowY, totalsW, metrics, 20);
+    drawMetricColumns(ctx, totalsX, rowY, totalsW, metrics, 20);
 
-    ctx.font = `500 22px ${FONT}`;
+    ctx.font = `500 18px ${FONT}`;
     ctx.fillStyle = COLORS.sumIcon;
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
     ctx.fillText("Σ", sigmaX + sigmaW / 2, rowY + 2);
     ctx.textAlign = "left";
 
-    drawPriceBlock(ctx, priceX, rowY + 2, cost.amount, cost.decimal);
+    drawPriceAmount(ctx, priceX, rowY + 2, cost.amount, cost.decimal);
 
-    ctx.font = `500 26px ${FONT}`;
+    ctx.font = `500 20px ${FONT}`;
     ctx.fillStyle = COLORS.sumIcon;
-    ctx.fillText("+", gridLeft + resourcesColW + 8, rowY + 2);
-    drawAddonBlock(ctx, gridLeft + resourcesColW + addonsColW, rowY + 2, packagePrice, packageName);
+    ctx.fillText("+", plusX, rowY + 2);
+
+    drawAddonAmount(ctx, addonX, rowY + 2, packagePrice);
+
+    drawFooterCaption(ctx, ["Resources cost", "per month"], priceX, captionY, priceW, "left");
+    drawFooterCaption(
+      ctx,
+      [`${packageName} pkg.`, "per month"],
+      addonX,
+      captionY,
+      96,
+      "right",
+    );
   } else {
     drawMetricColumns(ctx, gridLeft, rowY, gridW, metrics, 18);
-    drawPriceBlock(ctx, gridLeft, rowY + 40, cost.amount, cost.decimal);
+    drawPriceAmount(ctx, gridLeft, rowY + 44, cost.amount, cost.decimal);
 
-    ctx.font = `500 26px ${FONT}`;
+    ctx.font = `500 20px ${FONT}`;
     ctx.fillStyle = COLORS.sumIcon;
-    ctx.fillText("+", gridLeft + 8, rowY + 96);
-    drawAddonBlock(ctx, gridRight, rowY + 100, packagePrice, packageName);
+    ctx.fillText("+", gridLeft + 8, rowY + 92);
+    drawAddonAmount(ctx, gridRight, rowY + 96, packagePrice);
+
+    drawFooterCaption(ctx, ["Resources cost per month"], gridLeft, rowY + 72, gridW, "left");
+    drawFooterCaption(
+      ctx,
+      [`${packageName} pkg. per month`],
+      gridRight,
+      rowY + 118,
+      gridW,
+      "right",
+    );
   }
 }
 
-export function measureResourcesDiagram(options: Pick<DrawOptions, "config" | "width">): number {
-  return computeLayout(options.width, displayServices(options.config).length).height;
+export function measureResourcesDiagram(
+  options: Pick<DrawOptions, "config" | "width">,
+): number {
+  const services = displayServices(options.config);
+  return computeLayout(options.width, services.length).height;
 }
 
 export function drawResourcesDiagram(ctx: CanvasRenderingContext2D, options: DrawOptions): number {
@@ -516,7 +557,7 @@ export function drawResourcesDiagram(ctx: CanvasRenderingContext2D, options: Dra
 
   let y = layout.pad;
   drawCoreBlock(ctx, config.projectMode, centerX, y, layout.coreW);
-  y += 96 + 20;
+  y += 96 + 24;
 
   const gridX = layout.pad;
   services.forEach((service, index) => {
@@ -536,7 +577,7 @@ export function drawResourcesDiagram(ctx: CanvasRenderingContext2D, options: Dra
   });
 
   const rows = Math.ceil(services.length / layout.cols);
-  y += rows * layout.cardH + Math.max(0, rows - 1) * layout.gap + 28;
+  y += rows * layout.cardH + Math.max(0, rows - 1) * layout.gap + 32;
   drawFooter(ctx, config, services, layout, width, y);
 
   return layout.height;

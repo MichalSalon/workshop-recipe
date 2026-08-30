@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   ArrowRight,
   Bot,
@@ -21,12 +22,13 @@ import {
 } from "@/components/ui/card";
 import { ResourceOverprovisionBanner } from "@/components/ResourceOverprovisionBanner";
 import { ResourcesDiagram } from "@/components/ResourcesDiagram";
+import { WorkshopStack } from "@/components/WorkshopStack";
 import {
   activeResourceConfig,
   analyzeResourceConfig,
   workshopEnv,
 } from "@/lib/workshop-resources";
-import { AGENDA, LINKS, STACK, WORKSHOP } from "@/workshop-config";
+import { AGENDA, LINKS, WORKSHOP } from "@/workshop-config";
 
 const PILLS = [
   { label: "AI coding agent", Icon: Bot },
@@ -35,6 +37,34 @@ const PILLS = [
   { label: "Scale & observe", Icon: Scale },
   { label: "Production control", Icon: Bug },
 ] as const;
+
+const SECTION = "px-4 py-16 sm:px-6 lg:py-20";
+const CONTAINER = "mx-auto max-w-6xl lg:max-w-5xl";
+const SECTION_TITLE = "text-2xl font-semibold tracking-tight text-white sm:text-[1.625rem]";
+const SECTION_DESC = "mt-3 max-w-2xl text-base leading-relaxed text-zinc-400";
+const SECTION_BODY = "mt-8";
+
+function SectionHeader({
+  title,
+  description,
+  aside,
+}: {
+  title: string;
+  description: ReactNode;
+  aside?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-2xl">
+        <h2 className={SECTION_TITLE}>{title}</h2>
+        <div className={`${SECTION_DESC} space-y-2`}>
+          {typeof description === "string" ? <p>{description}</p> : description}
+        </div>
+      </div>
+      {aside ? <p className="shrink-0 text-sm text-zinc-500">{aside}</p> : null}
+    </div>
+  );
+}
 
 type WorkshopHomeProps = {
   onOpenApp?: () => void;
@@ -80,7 +110,7 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
       </header>
 
       <main className="relative z-10">
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:max-w-5xl lg:pt-20">
+        <section className={`${CONTAINER} px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pt-20`}>
           <Badge
             variant="secondary"
             className="mb-5 border border-primary/20 bg-primary/10 text-primary hover:bg-primary/10"
@@ -141,22 +171,15 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
 
         </section>
 
-        <section className="border-y border-white/10 bg-[#0f1115]/80 px-4 py-14 sm:px-6 sm:py-16">
-          <div className="mx-auto max-w-6xl lg:max-w-5xl">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-                  What you did
-                </h2>
-                <p className="mt-2 max-w-xl text-sm text-zinc-400 sm:text-base">
-                  You built the app and wrote the Zerops recipe yourself — no pre-published
-                  recipe to import. The agent helped you do both in ZCP.
-                </p>
-              </div>
-              <p className="text-sm text-zinc-500">Markdown → workers → PNG/PDF</p>
-            </div>
+        <section className={`border-y border-white/10 bg-[#0f1115]/80 ${SECTION}`}>
+          <div className={CONTAINER}>
+            <SectionHeader
+              title="What you did"
+              description="You built the app and wrote the Zerops recipe yourself — no pre-published recipe to import. The agent helped you do both in ZCP."
+              aside="Markdown → workers → PNG/PDF"
+            />
 
-            <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <ol className={`${SECTION_BODY} grid gap-4 sm:grid-cols-2 lg:grid-cols-5`}>
               {AGENDA.map(({ step, title, body }) => (
                 <li key={step}>
                   <Card className="h-full border-white/10 bg-[#161922]/80 shadow-none">
@@ -174,70 +197,47 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
           </div>
         </section>
 
-        <section
-          id="coupon"
-          className="scroll-mt-20 border-b border-white/10 px-4 py-14 sm:px-6 sm:py-16"
-        >
-          <div className="mx-auto max-w-6xl lg:max-w-5xl">
+        <section id="coupon" className={`scroll-mt-20 border-b border-white/10 ${SECTION}`}>
+          <div className={CONTAINER}>
             <CouponBanner embedded />
           </div>
         </section>
 
-        <section className="border-y border-white/10 bg-[#0f1115]/80 px-4 py-14 sm:px-6 sm:py-16">
-          <div className="mx-auto max-w-6xl lg:max-w-5xl">
-            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">My resources</h2>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-400 sm:text-base">
-              Live allocation for this project — same layout as the Zerops recipe resources
-              diagram, with monthly cost from platform pricing.
-              {isDevProject && resourceAnalysis.oversizedServices.length > 0 ? (
-                <>
-                  {" "}
-                  Orange <strong className="font-medium text-amber-300/90">TOO BIG</strong> cards
-                  show what to right-size in{" "}
-                  <span className="font-mono text-xs text-zinc-300">import-app.yaml</span>.
-                </>
-              ) : null}
-            </p>
+        <section className={`border-y border-white/10 bg-[#0f1115]/80 ${SECTION}`}>
+          <div className={CONTAINER}>
+            <SectionHeader
+              title="My resources"
+              description="Live allocation for this project — same layout as the Zerops recipe resources diagram, with monthly cost from platform pricing."
+            />
 
-            {isDevProject ? (
-              <div className="mt-6">
+            {isDevProject && resourceAnalysis.oversizedServices.length > 0 ? (
+              <div className={SECTION_BODY}>
                 <ResourceOverprovisionBanner analysis={resourceAnalysis} />
               </div>
             ) : null}
 
-            <div className="mt-8 rounded-xl border border-white/10 bg-[#161922]/60 p-4 sm:p-6">
+            <div
+              className={`${isDevProject && resourceAnalysis.oversizedServices.length > 0 ? "mt-6" : SECTION_BODY} overflow-hidden rounded-xl border border-white/10 bg-[#161922]/60 p-4 sm:p-6`}
+            >
               <ResourcesDiagram config={resourceConfig} highlightOversized={isDevProject} />
             </div>
           </div>
         </section>
 
-        <section className="px-4 py-14 sm:px-6 sm:py-16">
-          <div className="mx-auto max-w-6xl lg:max-w-5xl">
-            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-              The stack you deployed
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-400 sm:text-base">
-              Six services on Zerops — frontend, API, worker, PostgreSQL, NATS, and Valkey —
-              wired up by your agent and captured in the recipe you authored.
-            </p>
+        <section className={SECTION}>
+          <div className={CONTAINER}>
+            <SectionHeader
+              title="The stack you deployed"
+              description="Six services on Zerops — frontend, API, worker, PostgreSQL, NATS, and Valkey — wired up by your agent and captured in the recipe you authored."
+            />
 
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              {STACK.map(({ name, role }) => (
-                <div
-                  key={name}
-                  className="rounded-lg border border-white/10 bg-[#161922]/60 px-4 py-3"
-                >
-                  <p className="font-mono text-sm text-primary">{name}</p>
-                  <p className="mt-1 text-xs text-zinc-500">{role}</p>
-                </div>
-              ))}
-            </div>
+            <WorkshopStack className={SECTION_BODY} />
           </div>
         </section>
       </main>
 
-      <footer className="relative z-10 border-t border-white/10 px-4 py-10 sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:justify-between lg:max-w-5xl">
+      <footer className={`relative z-10 border-t border-white/10 ${SECTION} pb-12 pt-10`}>
+        <div className={`${CONTAINER} flex flex-col gap-8 sm:flex-row sm:justify-between`}>
           <a href={LINKS.zerops} target="_blank" rel="noreferrer" className="text-white">
             <SiteLogo />
           </a>

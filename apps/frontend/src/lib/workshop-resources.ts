@@ -61,7 +61,7 @@ export function containerCount(service: RecipeServiceConfig): number {
 }
 
 /** Short label for diagram cards — e.g. "3→1 replicas, minRam 1→0.5 GB". */
-export function describeOversizedFix(service: RecipeServiceConfig): string {
+export function describeOversizedFix(service: RecipeServiceConfig, compact = false): string {
   if (!service.oversizedInDev || !service.recipeBaseline?.minResource || !service.autoscaling) {
     return "";
   }
@@ -76,14 +76,14 @@ export function describeOversizedFix(service: RecipeServiceConfig): string {
   const currentRam = service.autoscaling.verticalAutoscaling.minResource.memoryGBytes;
   const targetRam = service.recipeBaseline.minResource.memoryGBytes;
   if (currentRam > targetRam) {
-    parts.push(`minRam ${formatResourceNumber(currentRam)}→${formatResourceNumber(targetRam)} GB`);
+    parts.push(
+      compact
+        ? `RAM ${formatResourceNumber(currentRam)}→${formatResourceNumber(targetRam)}`
+        : `minRam ${formatResourceNumber(currentRam)}→${formatResourceNumber(targetRam)} GB`,
+    );
   }
 
-  if (service.name === "db") {
-    parts.push("postgresql:single@17 + oltp-hobby");
-  }
-
-  return parts.join(", ");
+  return parts.join(compact ? " · " : ", ");
 }
 
 export type OversizedFixGroup = {
@@ -99,7 +99,6 @@ export function oversizedFixGroups(services: RecipeServiceConfig[]): OversizedFi
   const appSlots = oversized.filter((service) =>
     ["frontend", "api", "worker"].includes(service.name),
   );
-  const db = oversized.find((service) => service.name === "db");
 
   const groups: OversizedFixGroup[] = [];
 
@@ -107,28 +106,11 @@ export function oversizedFixGroups(services: RecipeServiceConfig[]): OversizedFi
     groups.push({
       hostnames: appSlots.map((service) => service.name).join(", "),
       steps: [
-        "In workshop/dev/import-app.yaml: remove minContainers: 3 (default is 1).",
-        "Set minRam to the AI Agent recipe values (frontend 0.25, api 0.5, worker 1).",
+        "In workshop/dev/import-app.yaml: remove minContainers: 3 on frontend, api, and worker (default is 1).",
+        "Update apps/frontend/src/config/resources-dev.json so those three services show 1 container in the diagram.",
       ],
     });
   }
-
-  if (db) {
-    groups.push({
-      hostnames: "db",
-      steps: [
-        "Replace postgresql:ha@17 + profile oltp-staging with postgresql:single@17 + profile oltp-hobby.",
-        `Right now: ${containerCount(db)} Postgres nodes; recipe needs 1.`,
-      ],
-    });
-  }
-
-  groups.push({
-    hostnames: "resources-dev.json",
-    steps: [
-      "Update apps/frontend/src/config/resources-dev.json to match — the amber warning clears when allocations align.",
-    ],
-  });
 
   return groups;
 }

@@ -13,8 +13,9 @@ own VictoriaLogs URL and read-only token before import, or set them in the
 GUI after.
 
 Optional: import `import-app.yaml` into this project to pre-create the full
-AI Agent topology (dev + prod slots, db, cache, queue). Prod slots are
-required; import intentionally oversizes them for workshop prompt #1.
+AI Agent topology (dev + prod slots, db, cache, queue). Prod slots run
+3 containers each for workshop prompt #1 — attendees scale frontend, api,
+and worker down to 1.
 
 Confirm the agent can query logs **before** stage day:
 

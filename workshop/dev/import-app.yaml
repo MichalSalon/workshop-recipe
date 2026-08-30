@@ -5,9 +5,8 @@
 # topology the agent would otherwise provision live.
 # zeropsSetup names match zerops.yaml in the repo root.
 #
-# Workshop prompt #1: same hostnames as recipes/deck-renderer/0 — AI Agent,
-# but prod slots + db are over-provisioned (3 replicas, staging Postgres).
-# Attendees right-size to the recipe — do not remove frontend/api/worker.
+# Workshop prompt #1: prod slots frontend/api/worker run 3 containers each;
+# the AI Agent recipe uses 1. Attendees scale down — db/cache/queue stay as-is.
 #
 # No URL value store — zerops.yaml resolves public URLs from
 # ${hostname_zeropsSubdomain} on these hostnames.
