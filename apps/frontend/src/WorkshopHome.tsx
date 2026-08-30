@@ -174,6 +174,15 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
           </div>
         </section>
 
+        <section
+          id="coupon"
+          className="scroll-mt-20 border-b border-white/10 px-4 py-14 sm:px-6 sm:py-16"
+        >
+          <div className="mx-auto max-w-6xl lg:max-w-5xl">
+            <CouponBanner embedded />
+          </div>
+        </section>
+
         <section className="border-y border-white/10 bg-[#0f1115]/80 px-4 py-14 sm:px-6 sm:py-16">
           <div className="mx-auto max-w-6xl lg:max-w-5xl">
             <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">My resources</h2>
@@ -223,15 +232,6 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section
-          id="coupon"
-          className="scroll-mt-20 px-4 pb-14 sm:px-6 sm:pb-16"
-        >
-          <div className="mx-auto max-w-6xl lg:max-w-5xl">
-            <CouponBanner embedded />
           </div>
         </section>
       </main>

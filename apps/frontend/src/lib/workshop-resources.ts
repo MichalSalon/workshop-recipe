@@ -8,6 +8,7 @@ import {
   type ResourceTotals,
 } from "@/lib/zerops-pricing";
 import type { RecipeServiceConfig, ResourceStackConfig } from "@/lib/diagram-types";
+import { WORKSHOP } from "@/workshop-config";
 
 export type { RecipeServiceConfig, ResourceStackConfig };
 export const DEV_RESOURCE_CONFIG = devResources as ResourceStackConfig;
@@ -154,10 +155,25 @@ export function analyzeResourceConfig(config: ResourceStackConfig): ResourceAnal
   };
 }
 
+export function isWorkshopDevHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  if (host === "localhost" || host === "127.0.0.1") return true;
+  return WORKSHOP.devProjectHostnameMarkers.some((marker) => host.includes(marker));
+}
+
+/**
+ * Dev vs prod resource diagram. The static frontend setup bakes VITE_WORKSHOP_ENV=prod
+ * for both projects, so deployed workshop-dev is detected from the hostname.
+ */
 export function workshopEnv(): "dev" | "prod" {
   const env = import.meta.env.VITE_WORKSHOP_ENV;
-  if (env === "dev" || env === "prod") return env;
-  return import.meta.env.DEV ? "dev" : "prod";
+  if (env === "dev") return "dev";
+  if (import.meta.env.DEV) return "dev";
+  if (typeof window !== "undefined" && isWorkshopDevHost(window.location.hostname)) {
+    return "dev";
+  }
+  if (env === "prod") return "prod";
+  return "dev";
 }
 
 export function activeResourceConfig(): ResourceStackConfig {
