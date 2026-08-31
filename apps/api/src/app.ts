@@ -15,26 +15,15 @@ export type AppDeps = {
   bus: Bus;
   cache: Cache;
   appUrl: string;
-  // Project-scope subdomain host. Every public URL in the project contains
-  // it, so matching on it admits the SPA from whichever region the project
-  // runs in — without naming a region or referencing the frontend service.
+  // Kept for callers that still pass it; CORS no longer filters on it.
   subdomainHost?: string;
 };
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function corsOrigins(deps: AppDeps): (string | RegExp)[] {
-  const origins: (string | RegExp)[] = [deps.appUrl, /localhost/];
-  const host = deps.subdomainHost?.trim();
-  if (host) origins.push(new RegExp(escapeRegExp(host)));
-  return origins;
-}
-
 export async function buildApp(deps: AppDeps) {
   const app = Fastify({ logger: false });
-  await app.register(cors, { origin: corsOrigins(deps) });
+  // Allow any origin: reflect the request Origin header back, which keeps
+  // credentialed requests working (a literal "*" would not).
+  await app.register(cors, { origin: true });
   await app.register(websocket);
 
   const sockets = new Set<{ send: (raw: string) => void }>();
