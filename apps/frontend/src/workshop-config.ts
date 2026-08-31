@@ -5,6 +5,8 @@ export const WORKSHOP = {
     "You built a real app with an AI coding agent and took it from prompt to deployment with ZCP — a multi-service stack on Zerops, scaled and debugged while keeping production under control.",
   /** Hostname fragments that identify the workshop-dev Zerops project (not prod). */
   devProjectHostnameMarkers: ["workshop-dev", "frontenddev", "apidev"] as const,
+  /** Hostname fragments for workshop-prod — hide the over-provision prompt there. */
+  prodProjectHostnameMarkers: ["workshop-prod"] as const,
   coupon: {
     code: "CYC2026",
     verificationPaymentUsd: 10,

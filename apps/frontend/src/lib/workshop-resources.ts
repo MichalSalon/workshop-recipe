@@ -143,18 +143,29 @@ export function isWorkshopDevHost(hostname: string): boolean {
   return WORKSHOP.devProjectHostnameMarkers.some((marker) => host.includes(marker));
 }
 
+export function isWorkshopProdHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  return WORKSHOP.prodProjectHostnameMarkers.some((marker) => host.includes(marker));
+}
+
 /**
- * Dev vs prod resource diagram. The static frontend setup bakes VITE_WORKSHOP_ENV=prod
- * for both projects, so deployed workshop-dev is detected from the hostname.
+ * Dev vs prod resource diagram. The prod frontend setup bakes VITE_WORKSHOP_ENV=prod,
+ * but the homepage should still show the workshop-dev over-provision state unless the
+ * URL is workshop-prod. workshop-dev is also detected from hostname (frontenddev, etc.).
  */
 export function workshopEnv(): "dev" | "prod" {
+  if (import.meta.env.DEV) return "dev";
+
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (isWorkshopProdHost(hostname)) return "prod";
+    if (isWorkshopDevHost(hostname)) return "dev";
+  }
+
   const env = import.meta.env.VITE_WORKSHOP_ENV;
   if (env === "dev") return "dev";
-  if (import.meta.env.DEV) return "dev";
-  if (typeof window !== "undefined" && isWorkshopDevHost(window.location.hostname)) {
-    return "dev";
-  }
-  if (env === "prod") return "prod";
+  if (env === "prod") return "dev";
+
   return "dev";
 }
 
