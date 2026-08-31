@@ -56,7 +56,7 @@ export const AGENDA = [
   {
     step: "04",
     title: "Used ZCP prompts",
-    body: "Extended the app with predefined workshop prompts — right-size resources, tweak the UI, add auth, and more.",
+    body: "Extended the app with three predefined ZCP prompts: light theme, live slide count, and basic auth.",
   },
 ] as const;
 
