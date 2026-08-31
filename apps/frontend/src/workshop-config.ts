@@ -31,6 +31,12 @@ export const LINKS = {
   github: "https://github.com/zeropsio",
 } as const;
 
+/** Promo top-up link — coupon code is URL-safe base64 without padding. */
+export function couponPromoUrl(code: string): string {
+  const encoded = btoa(code).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return `https://app.zerops.io/promo/${encoded}/top-up`;
+}
+
 export const AGENDA = [
   {
     step: "01",

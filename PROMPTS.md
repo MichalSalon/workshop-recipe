@@ -51,14 +51,20 @@ the UI minimal and consistent with the current design.
 
 ---
 
-## 4. Sample deck picker
+## 4. Basic auth on the website
 
 ```
-Add a small "Load sample" control on the Deck Renderer editor that inserts the
-welcome fixture deck (fixtures/welcome.md) into the textarea with one click.
+Add HTTP Basic Auth to the workshop site. Visitors must enter a username and password
+before they can use the homepage (/), Deck Renderer (/app), or prompts page (/prompts).
 
-Include a confirmation if the editor already has content. Keep it a simple button
-or dropdown — no new routes.
+Protect the API the same way — unauthenticated requests should get 401.
+
+Use env vars for credentials (e.g. WORKSHOP_AUTH_USER and WORKSHOP_AUTH_PASSWORD).
+Wire them in zerops.yaml for frontend and api — never hardcode usernames or passwords.
+
+Use whatever fits each service: nginx/htpasswd for the static frontend, Fastify
+middleware for the API. Prefer the browser's native basic-auth prompt; no custom
+login UI unless the static setup needs it.
 ```
 
 ---

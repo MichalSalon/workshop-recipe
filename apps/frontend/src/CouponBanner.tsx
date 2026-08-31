@@ -2,7 +2,7 @@ import { ArrowRight, Download, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { downloadCouponImage } from "@/download-coupon-image";
-import { LINKS, WORKSHOP } from "@/workshop-config";
+import { couponPromoUrl, WORKSHOP } from "@/workshop-config";
 
 const { coupon } = WORKSHOP;
 
@@ -75,7 +75,7 @@ export function CouponBanner({ embedded = false }: CouponBannerProps) {
 
           <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
             <Button size="lg" className="h-12 px-8 text-base" asChild>
-              <a href={LINKS.payment} target="_blank" rel="noreferrer">
+              <a href={couponPromoUrl(coupon.code)} target="_blank" rel="noreferrer">
                 Go to payment
                 <ArrowRight />
               </a>
