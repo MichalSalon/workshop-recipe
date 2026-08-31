@@ -2,7 +2,7 @@ export const WORKSHOP = {
   title: "From Prompt to Prod: Build and Deploy with ZCP",
   tagline: "Build and Deploy with ZCP",
   description:
-    "You built a real app with an AI coding agent and took it from prompt to deployment with ZCP — a multi-service stack on Zerops, scaled and debugged while keeping production under control.",
+    "You deployed a real multi-service app on Zerops with the recipe, then extended and debugged it in ZCP — frontend, API, workers, PostgreSQL, NATS, and Valkey, with production kept under control.",
   /** Hostname fragments that identify the workshop-dev Zerops project (not prod). */
   devProjectHostnameMarkers: ["workshop-dev", "frontenddev", "apidev"] as const,
   /** Hostname fragments for workshop-prod — hide the over-provision prompt there. */
