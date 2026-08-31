@@ -5,27 +5,7 @@ can finish in a few minutes without touching unrelated parts of the app.
 
 ---
 
-## 1. Fix deployment resources (using too many)
-
-```
-We're using too many resources in workshop-dev. The homepage "My resources"
-section shows an amber warning — frontend, api, and worker each run
-3 containers instead of 1 like the AI Agent recipe.
-
-import-app.yaml only sets the initial state when the project is imported; it
-does not change a running project. Scale the live services in ZCP:
-- frontend, api, worker: set horizontal autoscaling to 1 container each
-
-db, cache, and queue are fine — leave them as-is.
-
-After scaling, update apps/frontend/src/config/resources-dev.json so the
-homepage diagram matches (1 container on those three). The amber warning and
-"TOO BIG" badges should disappear and monthly cost should drop.
-```
-
----
-
-## 2. Light Zerops theme
+## 1. Light Zerops theme
 
 ```
 Switch the workshop homepage and Deck Renderer SPA from the current dark theme to a
@@ -39,7 +19,7 @@ in light mode. Do not change API or worker behaviour.
 
 ---
 
-## 3. Slide count in the editor
+## 2. Slide count in the editor
 
 ```
 In the Deck Renderer app (/app), show a live slide count next to the markdown
@@ -51,7 +31,7 @@ the UI minimal and consistent with the current design.
 
 ---
 
-## 4. Basic auth on the website
+## 3. Basic auth on the website
 
 ```
 Add HTTP Basic Auth to the workshop site. Visitors must enter a username and password
@@ -61,16 +41,4 @@ Protect the API the same way — unauthenticated requests should get 401.
 
 Use env vars for credentials (e.g. WORKSHOP_AUTH_USER and WORKSHOP_AUTH_PASSWORD).
 Wire them in zerops.yaml for frontend and api — never hardcode usernames or passwords.
-```
-
----
-
-## 5. Keyboard shortcut to render
-
-```
-Add a keyboard shortcut (Cmd/Ctrl + Enter) on the Deck Renderer page to submit
-the current markdown for rendering, same as clicking the main render button.
-
-Show a subtle hint near the button ("⌘↵ to render"). Guard against double-submit
-while a job is in progress.
 ```
