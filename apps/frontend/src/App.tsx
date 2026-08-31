@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
+import { CapabilityInventory } from "./CapabilityInventory";
 import { DeckApp } from "./DeckApp";
 import { WorkshopHome } from "./WorkshopHome";
 import { WorkshopPrompts } from "./WorkshopPrompts";
 
-type View = "home" | "app" | "prompts";
+type View = "home" | "app" | "prompts" | "capabilities";
 
 function viewFromPath(path: string): View {
   if (path === "/app" || path.startsWith("/app/")) return "app";
   if (path === "/prompts" || path.startsWith("/prompts/")) return "prompts";
+  if (path === "/capabilities" || path.startsWith("/capabilities/")) return "capabilities";
   return "home";
 }
 
@@ -20,7 +22,9 @@ export function App() {
         ? "Deck Renderer — Zerops"
         : view === "prompts"
           ? "ZCP Prompts — Zerops Workshop"
-          : "From Prompt to Prod — Zerops Workshop";
+          : view === "capabilities"
+            ? "Zerops capability inventory"
+            : "Zerops — CYC2026 workshop";
   }, [view]);
 
   useEffect(() => {
@@ -44,9 +48,29 @@ export function App() {
     setView("prompts");
   }, []);
 
+  const openCapabilities = useCallback(() => {
+    window.history.pushState({}, "", "/capabilities");
+    setView("capabilities");
+  }, []);
+
   if (view === "app") return <DeckApp onHome={openHome} />;
   if (view === "prompts") {
     return <WorkshopPrompts onOpenHome={openHome} onOpenApp={openApp} />;
   }
-  return <WorkshopHome onOpenApp={openApp} onOpenPrompts={openPrompts} />;
+  if (view === "capabilities") {
+    return (
+      <CapabilityInventory
+        onOpenHome={openHome}
+        onOpenPrompts={openPrompts}
+        onOpenApp={openApp}
+      />
+    );
+  }
+  return (
+    <WorkshopHome
+      onOpenApp={openApp}
+      onOpenPrompts={openPrompts}
+      onOpenCapabilities={openCapabilities}
+    />
+  );
 }

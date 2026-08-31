@@ -39,20 +39,64 @@ API or worker behaviour.
     id: 2,
     title: "Slide count in the editor",
     text: `In the Deck Renderer app (/app), show a live slide count next to the markdown
-editor title — e.g. "3 slides" — that updates as the user edits markdown.
+editor title — e.g. "3 slides" — that updates as the user types. Do not change
+API or worker behaviour. Do not use the job \`slideCount\` state — that is
+rendered-slide progress after submit, not the live draft count.
 
-Use the existing slide parsing logic from the shared package if available; keep
-the UI minimal and consistent with the current design.`,
+1. apps/frontend/src/DeckApp.tsx — the editor pane (left column) has only an
+   sr-only <label> today. Add a visible header above the textarea that matches
+   the "Live preview" header on the right:
+   - Title: "Markdown"
+   - Count: "\${drafts.length} slide" / "slides" (pluralize)
+   - tabular-nums + muted text, same weight as the preview pager (1 / N)
+
+2. Reuse the existing \`drafts\` memo. It already calls \`splitSlides(source)\`
+   from \`@deck/shared\` (split on a line that is only \`---\`). Do not write a
+   second parser.
+
+3. Verify on /app: the sample deck shows "3 slides"; deleting a \`---\` divider
+   drops the count immediately; an empty editor shows "1 slide"
+   (\`splitSlides\` fallback). The live preview pager still matches drafts.length.`,
   },
   {
     id: 3,
     title: "Basic auth on the website",
-    text: `Add HTTP Basic Auth to the workshop site. Visitors must enter a username and password
-before they can use the homepage (/), Deck Renderer (/app), or prompts page (/prompts).
+    text: `Add HTTP Basic Auth so visitors must sign in before using the workshop site
+(/, /app, /prompts, /capabilities) and before calling the API. Credentials
+come from env vars — never hardcode a username or password, and never bake
+them into the Vite bundle (no VITE_* secrets). Leave /health open so Zerops
+readiness checks keep passing. Do not change worker behaviour.
 
-Protect the API the same way — unauthenticated requests should get 401.
+1. apps/api/src/app.ts — Fastify onRequest hook:
+   - If WORKSHOP_AUTH_USER or WORKSHOP_AUTH_PASSWORD is unset, skip auth
+     (local \`npm run dev\` and existing tests stay open)
+   - Always allow GET /health
+   - Allow /ws (browsers cannot send Basic headers on WebSocket)
+   - Everything else requires Authorization: Basic … matching the env vars
+   - On failure: 401 and WWW-Authenticate: Basic realm="Workshop"
+   - CORS must allow the Authorization header
 
-Use env vars for credentials (e.g. WORKSHOP_AUTH_USER and WORKSHOP_AUTH_PASSWORD).
-Wire them in zerops.yaml for frontend and api — never hardcode usernames or passwords.`,
+2. apps/frontend — small login gate wrapping App (e.g. WorkshopAuthGate):
+   - On load, GET \${VITE_API_URL}/api/queue with no credentials
+   - 200 → auth is off, render the app
+   - 401 → show a username/password form (match workshop dark UI, teal button)
+   - On submit, retry /api/queue with Basic; store the header value in
+     sessionStorage so a refresh does not re-prompt
+   - Gate every workshop route — not just the deck editor
+
+3. apps/frontend/src/DeckApp.tsx — send the stored Authorization header on
+   every fetch to the API (queue, jobs, slides, pdf). Do not send it on the
+   WebSocket URL.
+
+4. zerops.yaml — add WORKSHOP_AUTH_USER and WORKSHOP_AUTH_PASSWORD under
+   run.envVariables for api and api-dev only. Do not put literal values in
+   the yaml; set the secrets in the Zerops UI. Never KEY: \${KEY} (self-shadow:
+   the literal \${...} string is what gets injected). Do not add these to
+   frontend, worker, or worker-dev.
+
+5. Verify: with env unset, / and /app work as today and GET /health is 200.
+   With both env vars set, a request without Authorization gets 401; /health
+   stays 200; after signing in, the homepage and deck app work and Create
+   slides succeeds.`,
   },
 ];

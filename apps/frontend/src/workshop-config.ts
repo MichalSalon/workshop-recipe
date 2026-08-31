@@ -1,6 +1,6 @@
 export const WORKSHOP = {
-  title: "From Prompt to Prod: Build and Deploy with ZCP",
-  tagline: "Build and Deploy with ZCP",
+  title: "Zerops — cloud platform for developers and their coding agents",
+  tagline: "CYC2026 workshop",
   description:
     "You deployed a real multi-service app on Zerops with the recipe, then extended and debugged it in ZCP — frontend, API, workers, PostgreSQL, NATS, and Valkey, with production kept under control.",
   /** Hostname fragments that identify the workshop-dev Zerops project (not prod). */
@@ -17,11 +17,22 @@ export const WORKSHOP = {
   },
   repo: "https://github.com/zeropsio/workshop-recipe",
   appName: "Deck Renderer",
+  /** Public short host for floor QR codes — attach this custom domain to frontend. */
+  shortHost: "cyc.zerops.io",
 } as const;
+
+/** One-click recipe import — AI Agent environment. */
+export const RECIPE_DEPLOY_URL =
+  "https://app.zerops.io/recipes/detail?github=https://github.com/zeropsio/workshop-recipe&environment=ai-agent";
+
+/** TinyURL for RECIPE_DEPLOY_URL — used on the floor QR. */
+export const RECIPE_DEPLOY_SHORT_URL = "https://tinyurl.com/26p2o2jt";
 
 export const LINKS = {
   zerops: "https://zerops.io",
   app: "https://app.zerops.io",
+  recipes: "https://app.zerops.io/recipes",
+  recipeDeploy: RECIPE_DEPLOY_URL,
   /** Credit & Spend — top-up and coupon entry after signup. */
   payment: "https://app.zerops.io/dashboard/finances",
   paymentDocs: "https://docs.zerops.io/company/payment",
@@ -30,6 +41,41 @@ export const LINKS = {
   discord: "https://discord.gg/zeropsio",
   github: "https://github.com/zeropsio",
 } as const;
+
+/** Workshop floor QR targets — build track vs capability inventory. */
+export const WORKSHOP_QR_CODES = [
+  {
+    id: "build",
+    title: "Build with us",
+    description: "Deck Renderer recipe — deploy and follow along in ZCP.",
+    href: RECIPE_DEPLOY_SHORT_URL,
+    urlLabel: RECIPE_DEPLOY_SHORT_URL.replace(/^https:\/\//, ""),
+    chatLinks: false,
+  },
+  {
+    id: "learn",
+    title: "Learn about Zerops",
+    description: "What the platform ships today, and what is on the roadmap.",
+    href: "/capabilities",
+    urlLabel: "Capability inventory",
+    chatLinks: true,
+  },
+] as const;
+
+const ASK_INVENTORY =
+  "Please read this Zerops platform capability inventory and help me understand what Zerops can do today and what is planned:\n\n";
+
+export function capabilityMarkdownUrl(origin: string): string {
+  return `${origin.replace(/\/$/, "")}/capabilities.md`;
+}
+
+export function openInChatGptUrl(docUrl: string): string {
+  return `https://chatgpt.com/?q=${encodeURIComponent(`${ASK_INVENTORY}${docUrl}`)}`;
+}
+
+export function openInClaudeUrl(docUrl: string): string {
+  return `https://claude.ai/new?q=${encodeURIComponent(`${ASK_INVENTORY}${docUrl}`)}`;
+}
 
 /** Promo top-up link — coupon code is URL-safe base64 without padding. */
 export function couponPromoUrl(code: string): string {
@@ -67,4 +113,40 @@ export const STACK = [
   { name: "db", role: "PostgreSQL" },
   { name: "queue", role: "NATS jobs" },
   { name: "cache", role: "Valkey progress" },
+] as const;
+
+/** Four pillars — companion to presentation summary slide 3 (mirrors frontend-legacy selling-points layout). */
+export const ZEROPS_PILLARS = [
+  {
+    title: "Advanced affordable PaaS",
+    bullets: [
+      "Containers, managed databases, object storage, and private networking — all in one project.",
+      "L3/L7 balancers, env vars, logs, metrics, autoscaling, and SSL out of the box.",
+      "Minute-based pricing with no seat fees — scale from solo dev to production traffic.",
+    ],
+  },
+  {
+    title: "Full lifecycle — remote dev to HA prod",
+    bullets: [
+      "Identical infrastructure from local or remote development through staging to highly available production.",
+      "You or your coding agent work on the same hostnames, pipeline, and managed services.",
+      "No more “but it works on my machine” — only resource sizing differs between environments.",
+    ],
+  },
+  {
+    title: "Bring your own agent subscription",
+    bullets: [
+      "Use Claude Code, Codex, Antigravity, or Grok on the subscription you already pay for.",
+      "ZCP teaches your agent the platform — deploy, logs, scale, env vars — without reselling tokens.",
+      "Roughly 15× cheaper than platforms that bundle and mark up LLM access.",
+    ],
+  },
+  {
+    title: "Any tech stack — legacy becomes AI-ready",
+    bullets: [
+      "Node, Python, Go, PHP, Rust, static sites, VMs — deploy what you already run.",
+      "A real database, queue, and deploy pipeline mean any app on Zerops is agent-operable.",
+      "Drop a legacy monolith in and ZCP can extend, debug, and ship it like a greenfield stack.",
+    ],
+  },
 ] as const;

@@ -88,4 +88,69 @@
   .slide-prose code {
     @apply rounded bg-white/10 px-1 py-0.5 font-mono text-[13px];
   }
+
+  .inventory-prose {
+    @apply text-[15px] leading-relaxed text-zinc-300;
+  }
+
+  .inventory-prose > *:first-child {
+    @apply mt-0;
+  }
+
+  .inventory-prose h1 {
+    @apply mb-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl;
+  }
+
+  .inventory-prose h2 {
+    @apply mb-3 mt-12 text-xl font-semibold tracking-tight text-white sm:text-2xl;
+  }
+
+  .inventory-prose h3 {
+    @apply mb-2 mt-8 text-lg font-semibold text-white;
+  }
+
+  .inventory-prose p,
+  .inventory-prose li {
+    @apply mb-3;
+  }
+
+  .inventory-prose ul {
+    @apply mb-4 list-disc space-y-1 pl-5;
+  }
+
+  .inventory-prose ol {
+    @apply mb-4 list-decimal space-y-1 pl-5;
+  }
+
+  .inventory-prose strong {
+    @apply font-semibold text-white;
+  }
+
+  .inventory-prose code {
+    @apply rounded bg-white/10 px-1 py-0.5 font-mono text-[13px] text-zinc-100;
+  }
+
+  .inventory-prose a {
+    @apply text-primary underline-offset-4 hover:underline;
+  }
+
+  .inventory-prose blockquote {
+    @apply my-6 border-l-2 border-primary/50 pl-4 text-zinc-200;
+  }
+
+  .inventory-prose hr {
+    @apply my-10 border-white/10;
+  }
+
+  .inventory-prose table {
+    @apply mb-6 w-full border-collapse text-left text-sm;
+  }
+
+  .inventory-prose th {
+    @apply border-b border-white/15 pb-2 pr-3 font-semibold text-white;
+  }
+
+  .inventory-prose td {
+    @apply border-b border-white/10 py-2 pr-3 align-top text-zinc-300;
+  }
 }

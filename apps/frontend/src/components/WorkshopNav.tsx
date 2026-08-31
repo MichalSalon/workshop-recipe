@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LINKS } from "@/workshop-config";
 
-export type WorkshopNavPage = "home" | "prompts";
+export type WorkshopNavPage = "home" | "prompts" | "capabilities";
 
 type WorkshopNavProps = {
   current?: WorkshopNavPage;
+  variant?: "simple" | "full";
   onOpenHome?: () => void;
   onOpenPrompts?: () => void;
   onOpenApp?: () => void;
@@ -18,6 +19,7 @@ const navLink =
 
 export function WorkshopNav({
   current,
+  variant = "full",
   onOpenHome,
   onOpenPrompts,
   onOpenApp,
@@ -30,61 +32,62 @@ export function WorkshopNav({
         </a>
 
         <nav className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
-          {onOpenHome ? (
-            <button
-              type="button"
-              className={cn(navLink, current === "home" && "bg-white/5 text-white")}
-              onClick={onOpenHome}
-            >
-              Home
-            </button>
-          ) : (
-            <a
-              href="/"
-              className={cn(navLink, current === "home" && "bg-white/5 text-white")}
-            >
-              Home
-            </a>
-          )}
+          {variant === "full" ? (
+            <>
+              {onOpenHome ? (
+                <button
+                  type="button"
+                  className={cn(navLink, current === "home" && "bg-white/5 text-white")}
+                  onClick={onOpenHome}
+                >
+                  Home
+                </button>
+              ) : (
+                <a href="/" className={cn(navLink, current === "home" && "bg-white/5 text-white")}>
+                  Home
+                </a>
+              )}
 
-          {onOpenPrompts ? (
-            <button
-              type="button"
-              className={cn(
-                navLink,
-                "inline-flex items-center gap-1.5",
-                current === "prompts" && "bg-white/5 text-white",
+              {onOpenPrompts ? (
+                <button
+                  type="button"
+                  className={cn(
+                    navLink,
+                    "inline-flex items-center gap-1.5",
+                    current === "prompts" && "bg-white/5 text-white",
+                  )}
+                  onClick={onOpenPrompts}
+                >
+                  <ClipboardList className="size-3.5" aria-hidden="true" />
+                  <span className="hidden sm:inline">ZCP prompts</span>
+                  <span className="sm:hidden">Prompts</span>
+                </button>
+              ) : (
+                <a
+                  href="/prompts"
+                  className={cn(
+                    navLink,
+                    "inline-flex items-center gap-1.5",
+                    current === "prompts" && "bg-white/5 text-white",
+                  )}
+                >
+                  <ClipboardList className="size-3.5" aria-hidden="true" />
+                  <span className="hidden sm:inline">ZCP prompts</span>
+                  <span className="sm:hidden">Prompts</span>
+                </a>
               )}
-              onClick={onOpenPrompts}
-            >
-              <ClipboardList className="size-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">ZCP prompts</span>
-              <span className="sm:hidden">Prompts</span>
-            </button>
-          ) : (
-            <a
-              href="/prompts"
-              className={cn(
-                navLink,
-                "inline-flex items-center gap-1.5",
-                current === "prompts" && "bg-white/5 text-white",
-              )}
-            >
-              <ClipboardList className="size-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">ZCP prompts</span>
-              <span className="sm:hidden">Prompts</span>
-            </a>
-          )}
+            </>
+          ) : null}
 
           <Button size="sm" className="ml-1 sm:ml-2" asChild={!onOpenApp} onClick={onOpenApp}>
             {onOpenApp ? (
               <>
-                Open app
+                Open deck app
                 <ArrowRight />
               </>
             ) : (
               <a href="/app">
-                Open app
+                Open deck app
                 <ArrowRight />
               </a>
             )}
