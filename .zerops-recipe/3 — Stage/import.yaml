@@ -5,6 +5,7 @@
 
 project:
   name: deck-renderer-stage
+  location: us-west-1
 
 services:
   - hostname: frontend

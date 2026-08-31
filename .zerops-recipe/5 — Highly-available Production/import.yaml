@@ -6,6 +6,7 @@
 
 project:
   name: deck-renderer-ha-prod
+  location: us-west-1
   corePackage: SERIOUS
 
 services:

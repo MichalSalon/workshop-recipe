@@ -8,6 +8,7 @@
 
 project:
   name: deck-renderer-agent
+  location: us-west-1
 
 services:
   # Agent workspace — Browser VS Code + Zerops MCP. App code runs on

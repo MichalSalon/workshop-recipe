@@ -6,6 +6,7 @@
 
 project:
   name: deck-renderer-local
+  location: us-west-1
 
 services:
   - hostname: frontend
