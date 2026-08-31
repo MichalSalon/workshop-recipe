@@ -19,12 +19,12 @@ export function App() {
   useEffect(() => {
     document.title =
       view === "app"
-        ? "Deck Renderer — Zerops"
+        ? "Deck Renderer — Zerops AI workshop"
         : view === "prompts"
-          ? "ZCP Prompts — Zerops Workshop"
+          ? "ZCP Prompts — Zerops AI workshop"
           : view === "capabilities"
-            ? "Zerops capability inventory"
-            : "Zerops — CYC2026 workshop";
+            ? "Capability inventory — Zerops AI workshop"
+            : "Zerops AI workshop";
   }, [view]);
 
   useEffect(() => {

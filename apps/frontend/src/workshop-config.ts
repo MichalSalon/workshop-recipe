@@ -1,6 +1,6 @@
 export const WORKSHOP = {
-  title: "Zerops — cloud platform for developers and their coding agents",
-  tagline: "CYC2026 workshop",
+  title: "Zerops AI workshop",
+  tagline: "Cloud platform for developers and their coding agents",
   description:
     "You deployed a real multi-service app on Zerops with the recipe, then extended and debugged it in ZCP — frontend, API, workers, PostgreSQL, NATS, and Valkey, with production kept under control.",
   /** Hostname fragments that identify the workshop-dev Zerops project (not prod). */
@@ -25,8 +25,8 @@ export const WORKSHOP = {
 export const RECIPE_DEPLOY_URL =
   "https://app.zerops.io/recipes/detail?github=https://github.com/zeropsio/workshop-recipe&environment=ai-agent";
 
-/** TinyURL for RECIPE_DEPLOY_URL — used on the floor QR. */
-export const RECIPE_DEPLOY_SHORT_URL = "https://tinyurl.com/26p2o2jt";
+/** Floor QR short URL — /deploy on the workshop custom domain redirects to the recipe. */
+export const RECIPE_DEPLOY_SHORT_URL = `https://${WORKSHOP.shortHost}/deploy`;
 
 export const LINKS = {
   zerops: "https://zerops.io",
