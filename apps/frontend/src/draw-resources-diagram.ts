@@ -181,19 +181,23 @@ function drawContainerDots(ctx: CanvasRenderingContext2D, x: number, y: number, 
 
 function drawContainerBlock(
   ctx: CanvasRenderingContext2D,
-  x: number,
+  centerX: number,
   y: number,
   count: number,
   valueSize: number,
 ) {
   const dotY = y - valueSize + 4;
-  drawContainerDots(ctx, x, dotY, count);
   const dotW = Math.max(count, 1) * 13 - 3;
+  const label = count > 1 ? "Containers" : "Container";
   ctx.font = `500 ${Math.round(valueSize * 0.6)}px ${FONT}`;
+  const labelW = ctx.measureText(label).width;
+  const startX = centerX - (dotW + 6 + labelW) / 2;
+
+  drawContainerDots(ctx, startX, dotY, count);
   ctx.fillStyle = COLORS.resourceLabel;
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
-  ctx.fillText(count > 1 ? "Containers" : "Container", x + dotW + 6, y);
+  ctx.fillText(label, startX + dotW + 6, y);
 }
 
 function serviceTypeLabel(service: RecipeServiceConfig): string {
@@ -250,12 +254,13 @@ function drawServiceCard(
 
   const innerX = x + 14;
   const innerW = width - 28;
+  const centerX = x + width / 2;
   const headerY = y + 24;
   const hostname = serviceHostname(service);
 
   ctx.font = `700 15px ${FONT}`;
   ctx.fillStyle = COLORS.hostname;
-  ctx.textAlign = "left";
+  ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
 
   const hostnameMaxW = flagged ? innerW - 58 : innerW;
@@ -263,14 +268,14 @@ function drawServiceCard(
     ctx.measureText(hostname).width > hostnameMaxW
       ? `${hostname.slice(0, Math.max(8, Math.floor(hostnameMaxW / 8)))}…`
       : hostname;
-  ctx.fillText(hostnameText, innerX, headerY);
+  ctx.fillText(hostnameText, centerX, headerY);
 
   ctx.font = `500 12px ${FONT}`;
   ctx.fillStyle = COLORS.type;
   const typeLine = serviceTypeLabel(service);
   ctx.fillText(
     ctx.measureText(typeLine).width > innerW ? `${typeLine.slice(0, 18)}…` : typeLine,
-    innerX,
+    centerX,
     headerY + 18,
   );
 
@@ -284,7 +289,7 @@ function drawServiceCard(
   const containersY = headerY + 40;
   const metricsY = containersY + 26;
 
-  drawContainerBlock(ctx, innerX, containersY, containers, metricSize);
+  drawContainerBlock(ctx, centerX, containersY, containers, metricSize);
   drawMetricColumns(
     ctx,
     innerX,

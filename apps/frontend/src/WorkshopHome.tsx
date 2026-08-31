@@ -9,6 +9,7 @@ import {
   Terminal,
   Ticket,
 } from "lucide-react";
+import { WorkshopNav } from "@/components/WorkshopNav";
 import { SiteLogo } from "@/SiteLogo";
 import { CouponBanner } from "@/CouponBanner";
 import { Badge } from "@/components/ui/badge";
@@ -68,9 +69,10 @@ function SectionHeader({
 
 type WorkshopHomeProps = {
   onOpenApp?: () => void;
+  onOpenPrompts?: () => void;
 };
 
-export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
+export function WorkshopHome({ onOpenApp, onOpenPrompts }: WorkshopHomeProps) {
   const resourceConfig = activeResourceConfig();
   const resourceAnalysis = analyzeResourceConfig(resourceConfig);
   const isDevProject = workshopEnv() === "dev";
@@ -86,28 +88,11 @@ export function WorkshopHome({ onOpenApp }: WorkshopHomeProps) {
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
       />
 
-      <header className="relative z-10 border-b border-white/10 bg-[#12141a]/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:max-w-5xl">
-          <a href={LINKS.zerops} target="_blank" rel="noreferrer" className="text-white">
-            <SiteLogo />
-          </a>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button size="sm" asChild={!onOpenApp} onClick={onOpenApp}>
-              {onOpenApp ? (
-                <>
-                  Open app
-                  <ArrowRight />
-                </>
-              ) : (
-                <a href="/app">
-                  Open app
-                  <ArrowRight />
-                </a>
-              )}
-            </Button>
-          </div>
-        </div>
-      </header>
+      <WorkshopNav
+        current="home"
+        onOpenPrompts={onOpenPrompts}
+        onOpenApp={onOpenApp}
+      />
 
       <main className="relative z-10">
         <section className={`${CONTAINER} px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pt-20`}>

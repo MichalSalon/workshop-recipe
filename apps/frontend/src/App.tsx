@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { DeckApp } from "./DeckApp";
 import { WorkshopHome } from "./WorkshopHome";
+import { WorkshopPrompts } from "./WorkshopPrompts";
 
-type View = "home" | "app";
+type View = "home" | "app" | "prompts";
 
 function viewFromPath(path: string): View {
-  return path === "/app" || path.startsWith("/app/") ? "app" : "home";
+  if (path === "/app" || path.startsWith("/app/")) return "app";
+  if (path === "/prompts" || path.startsWith("/prompts/")) return "prompts";
+  return "home";
 }
 
 export function App() {
@@ -15,7 +18,9 @@ export function App() {
     document.title =
       view === "app"
         ? "Deck Renderer — Zerops"
-        : "From Prompt to Prod — Zerops Workshop";
+        : view === "prompts"
+          ? "ZCP Prompts — Zerops Workshop"
+          : "From Prompt to Prod — Zerops Workshop";
   }, [view]);
 
   useEffect(() => {
@@ -34,6 +39,14 @@ export function App() {
     setView("home");
   }, []);
 
+  const openPrompts = useCallback(() => {
+    window.history.pushState({}, "", "/prompts");
+    setView("prompts");
+  }, []);
+
   if (view === "app") return <DeckApp onHome={openHome} />;
-  return <WorkshopHome onOpenApp={openApp} />;
+  if (view === "prompts") {
+    return <WorkshopPrompts onOpenHome={openHome} onOpenApp={openApp} />;
+  }
+  return <WorkshopHome onOpenApp={openApp} onOpenPrompts={openPrompts} />;
 }
