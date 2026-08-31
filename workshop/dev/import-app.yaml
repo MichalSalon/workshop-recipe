@@ -5,8 +5,9 @@
 # topology the agent would otherwise provision live.
 # zeropsSetup names match zerops.yaml in the repo root.
 #
-# Workshop prompt #1: prod slots frontend/api/worker run 3 containers each;
-# the AI Agent recipe uses 1. Attendees scale down — db/cache/queue stay as-is.
+# Workshop prompt #1: prod slots frontend/api/worker start at 3 containers each;
+# the AI Agent recipe uses 1. Attendees scale down in ZCP (live autoscaling) —
+# this file is one-time import config, not how you change a running project.
 #
 # No URL value store — zerops.yaml resolves public URLs from
 # ${hostname_zeropsSubdomain} on these hostnames.

@@ -106,8 +106,9 @@ export function oversizedFixGroups(services: RecipeServiceConfig[]): OversizedFi
     groups.push({
       hostnames: appSlots.map((service) => service.name).join(", "),
       steps: [
-        "In workshop/dev/import-app.yaml: remove minContainers: 3 on frontend, api, and worker (default is 1).",
-        "Update apps/frontend/src/config/resources-dev.json so those three services show 1 container in the diagram.",
+        "In ZCP, scale frontend, api, and worker to 1 container each — update horizontal autoscaling on the running services.",
+        "import-app.yaml only sets the initial state at import; it does not change an already running project.",
+        "Then update apps/frontend/src/config/resources-dev.json so the homepage diagram shows 1 container on those three services.",
       ],
     });
   }

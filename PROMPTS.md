@@ -12,15 +12,15 @@ We're using too many resources in workshop-dev. The homepage "My resources"
 section shows an amber warning — frontend, api, and worker each run
 3 containers instead of 1 like the AI Agent recipe.
 
-Keep all hostnames (frontenddev, apidev, workerdev, frontend, api, worker,
-db, cache, queue). Right-size only the prod slots:
-- frontend, api, worker: remove minContainers: 3 (default is 1)
+import-app.yaml only sets the initial state when the project is imported; it
+does not change a running project. Scale the live services in ZCP:
+- frontend, api, worker: set horizontal autoscaling to 1 container each
 
 db, cache, and queue are fine — leave them as-is.
 
-Update workshop/dev/import-app.yaml and apps/frontend/src/config/resources-dev.json.
-After the fix, the amber warning and "TOO BIG" badges should disappear and
-monthly cost on the diagram should drop.
+After scaling, update apps/frontend/src/config/resources-dev.json so the
+homepage diagram matches (1 container on those three). The amber warning and
+"TOO BIG" badges should disappear and monthly cost should drop.
 ```
 
 ---

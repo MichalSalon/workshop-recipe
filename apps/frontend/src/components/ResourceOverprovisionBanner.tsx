@@ -6,6 +6,9 @@ type ResourceOverprovisionBannerProps = {
   analysis: ResourceAnalysis;
 };
 
+const ZCP_SCALE_EXAMPLE =
+  'Scale frontend, api, and worker to 1 container each in workshop-dev. Leave db, cache, and queue as they are.';
+
 export function ResourceOverprovisionBanner({ analysis }: ResourceOverprovisionBannerProps) {
   if (analysis.oversizedServices.length === 0 || analysis.monthlySavings <= 0) {
     return null;
@@ -32,10 +35,14 @@ export function ResourceOverprovisionBanner({ analysis }: ResourceOverprovisionB
               Orange <span className="font-medium text-amber-300">TOO BIG</span> cards run
               three replicas each — the AI Agent recipe uses one. db, cache, and queue are fine.
             </p>
+            <p className="text-amber-100/75">
+              Import YAML only creates the initial project shape. To cut cost on this running
+              project, change live autoscaling in ZCP — not the import file.
+            </p>
           </div>
 
           <div className="space-y-2">
-            <p className="font-medium text-amber-50">What to change</p>
+            <p className="font-medium text-amber-50">What to do</p>
             <ul className="space-y-4">
               {fixGroups.map((group) => (
                 <li key={group.hostnames} className="space-y-1.5">
@@ -50,14 +57,11 @@ export function ResourceOverprovisionBanner({ analysis }: ResourceOverprovisionB
             </ul>
           </div>
 
-          <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs sm:text-sm">
-            <code className="rounded-md bg-black/25 px-2 py-1 font-mono text-amber-50">
-              workshop/dev/import-app.yaml
-            </code>
-            <span className="self-center text-amber-100/50">→</span>
-            <code className="rounded-md bg-black/25 px-2 py-1 font-mono text-amber-50">
-              recipes/deck-renderer/0 — AI Agent/import.yaml
-            </code>
+          <div className="space-y-2">
+            <p className="font-medium text-amber-50">Try in ZCP</p>
+            <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg border border-amber-500/20 bg-black/25 p-3 font-mono text-xs text-amber-50 sm:text-sm">
+              {ZCP_SCALE_EXAMPLE}
+            </pre>
           </div>
 
           <p className="border-t border-amber-500/20 pt-4 text-amber-100/85">
@@ -66,7 +70,7 @@ export function ResourceOverprovisionBanner({ analysis }: ResourceOverprovisionB
               {formatMonthlyCost(analysis.cost)}/mo
             </span>
             <span className="mx-2 text-amber-100/40">→</span>
-            <span className="text-amber-100/70">after fix</span>{" "}
+            <span className="text-amber-100/70">after scaling</span>{" "}
             <span className="font-mono font-medium text-emerald-300">
               {formatMonthlyCost(analysis.recommendedCost)}/mo
             </span>
