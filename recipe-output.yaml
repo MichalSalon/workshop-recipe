@@ -12,7 +12,7 @@ files_created:
   - packages/shared/
   - packages/engine/
   - tests/
-  - recipes/deck-renderer/
+  - .zerops-recipe/
   - workshop/dev/
   - workshop/dev/import-app.yaml
   - workshop/prod/
@@ -27,7 +27,7 @@ strapi_fields:
   languages_frameworks: [Node.js, React]
 ready_for_testing: false
 notes:
-  - GUI recipe is recipes/deck-renderer/ (all 6 envs). Conference projects
+  - In-repo recipe is .zerops-recipe/ (all 6 envs). Conference projects
     stay under workshop/ (dev / prod).
   - Cover SVG reuses nodejs.svg from recipe-shared-assets — replace if a
     dedicated Deck Renderer cover is drawn.

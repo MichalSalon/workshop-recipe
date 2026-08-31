@@ -5,6 +5,7 @@ job and publishes work; workers render; Postgres stores results; Valkey carries
 progress; the browser watches the queue over a WebSocket.
 
 Deploy configuration is a repo-root `zerops.yaml` that you write. No Dockerfile.
+Import manifests for six lifecycle environments live in [`.zerops-recipe/`](.zerops-recipe/) (one `import.yaml` per folder).
 
 ## Services the code expects
 

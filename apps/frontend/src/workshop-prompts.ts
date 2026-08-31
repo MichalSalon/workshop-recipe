@@ -52,11 +52,7 @@ before they can use the homepage (/), Deck Renderer (/app), or prompts page (/pr
 Protect the API the same way — unauthenticated requests should get 401.
 
 Use env vars for credentials (e.g. WORKSHOP_AUTH_USER and WORKSHOP_AUTH_PASSWORD).
-Wire them in zerops.yaml for frontend and api — never hardcode usernames or passwords.
-
-Use whatever fits each service: nginx/htpasswd for the static frontend, Fastify
-middleware for the API. Prefer the browser's native basic-auth prompt; no custom
-login UI unless the static setup needs it.`,
+Wire them in zerops.yaml for frontend and api — never hardcode usernames or passwords.`,
   },
   {
     id: 5,
