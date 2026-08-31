@@ -160,11 +160,11 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts }: WorkshopHomeProps) {
           <div className={CONTAINER}>
             <SectionHeader
               title="What you did"
-              description="You built the app and wrote the Zerops recipe yourself — no pre-published recipe to import. The agent helped you do both in ZCP."
+              description="You used the Zerops recipe to deploy the stack, debugged on the platform, then extended the app in ZCP with predefined prompts."
               aside="Markdown → workers → PNG/PDF"
             />
 
-            <ol className={`${SECTION_BODY} grid gap-4 sm:grid-cols-2 lg:grid-cols-5`}>
+            <ol className={`${SECTION_BODY} grid gap-4 sm:grid-cols-2 lg:grid-cols-4`}>
               {AGENDA.map(({ step, title, body }) => (
                 <li key={step}>
                   <Card className="h-full border-white/10 bg-[#161922]/80 shadow-none">
@@ -213,7 +213,7 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts }: WorkshopHomeProps) {
           <div className={CONTAINER}>
             <SectionHeader
               title="The stack you deployed"
-              description="Six services on Zerops — frontend, API, worker, PostgreSQL, NATS, and Valkey — wired up by your agent and captured in the recipe you authored."
+              description="Six services on Zerops — frontend, API, worker, PostgreSQL, NATS, and Valkey — from the recipe you deployed."
             />
 
             <WorkshopStack className={SECTION_BODY} />

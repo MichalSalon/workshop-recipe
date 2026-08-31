@@ -40,28 +40,23 @@ export function couponPromoUrl(code: string): string {
 export const AGENDA = [
   {
     step: "01",
-    title: "Prompted",
-    body: "Described the Deck Renderer — markdown in, PNG/PDF slides out — and had the agent scaffold the monorepo in ZCP.",
+    title: "Used the recipe",
+    body: "Imported the Deck Renderer from `.zerops-recipe/` and deployed the full stack — frontend, API, worker, PostgreSQL, NATS, and Valkey.",
   },
   {
     step: "02",
-    title: "Built",
-    body: "Frontend, API, and workers with PostgreSQL, NATS, and Valkey. The agent provisioned services on Zerops as you went.",
+    title: "Deployed",
+    body: "Ran pipelines, opened the app, scaled workers, and watched markdown flow through the queue to PNG/PDF slides.",
   },
   {
     step: "03",
-    title: "Recipe",
-    body: "Authored the Zerops recipe — import.yaml and zerops.yaml — so the app deploys with one click. You wrote it live; nothing pre-published.",
+    title: "Debugged",
+    body: "Queried logs by hostname, traced jobs across services, and kept production credentials out of the agent's hands.",
   },
   {
     step: "04",
-    title: "Deployed",
-    body: "Ran your pipeline, shipped to dev, then production. Scaled workers and watched the queue in the browser.",
-  },
-  {
-    step: "05",
-    title: "Debugged",
-    body: "Queried logs by hostname. Kept production credentials out of the agent's hands.",
+    title: "Used ZCP prompts",
+    body: "Extended the app with predefined workshop prompts — right-size resources, tweak the UI, add auth, and more.",
   },
 ] as const;
 
