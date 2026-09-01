@@ -8,6 +8,7 @@ import {
   handleJob,
   migratePostgres,
   natsFromEnv,
+  resolveChromiumPath,
 } from "@deck/engine";
 import { buildApp } from "./app.js";
 import { readApiEnv } from "./env.js";
@@ -29,8 +30,14 @@ const cache = env.valkeyUrl
 
 if (env.inlineWorker) {
   const replicaId = process.env.WORKER_ID ?? "inline";
+  const chrome = resolveChromiumPath();
+  const renderDriver =
+    process.env.RENDER_DRIVER === "stub" || !chrome ? "stub" : "chromium";
+  if (chrome && renderDriver === "chromium") {
+    process.env.CHROMIUM_PATH = chrome;
+  }
   await bus.subscribe((jobId) =>
-    handleJob({ store, cache, replicaId, renderDriver: "stub" }, jobId),
+    handleJob({ store, cache, replicaId, renderDriver }, jobId),
   );
 }
 

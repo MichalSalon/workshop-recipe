@@ -9,19 +9,24 @@ type CouponImageInput = {
   workshopTotalUsd: number;
 };
 
-const FONT = "Inter, system-ui, sans-serif";
-const MONO = "ui-monospace, SFMono-Regular, Menlo, monospace";
+const FONT = "Geologica, ui-sans-serif, system-ui, sans-serif";
+const MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
+const SCALE = 2;
 
 const COLORS = {
-  bg: "#eceff3",
+  pageFrom: "#f3f5f7",
+  pageTo: "#e8eef0",
   card: "#ffffff",
-  cardBorder: "rgba(2, 179, 164, 0.35)",
+  cardBorder: "rgba(2, 179, 164, 0.45)",
   primary: "#02b3a4",
-  white: "#1a1a1a",
-  muted: "#64748b",
-  dim: "#94a3b8",
-  footerBg: "rgba(2, 179, 164, 0.08)",
-  urlBg: "rgba(2, 179, 164, 0.12)",
+  ink: "#1a1a1a",
+  muted: "#475569",
+  dim: "#64748b",
+  codeFill: "rgba(2, 179, 164, 0.07)",
+  colFill: "rgba(26, 26, 26, 0.035)",
+  colHiFill: "rgba(2, 179, 164, 0.1)",
+  footerFill: "rgba(2, 179, 164, 0.1)",
+  urlFill: "#ffffff",
 } as const;
 
 function roundRect(
@@ -32,16 +37,17 @@ function roundRect(
   h: number,
   r: number,
 ) {
+  const radius = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
   ctx.closePath();
 }
 
@@ -57,228 +63,220 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
       continue;
     }
     if (line) lines.push(line);
-    if (ctx.measureText(word).width <= maxWidth) {
-      line = word;
-      continue;
-    }
-    let chunk = "";
-    for (const char of word) {
-      const next = chunk + char;
-      if (ctx.measureText(next).width > maxWidth && chunk) {
-        lines.push(chunk);
-        chunk = char;
-      } else {
-        chunk = next;
-      }
-    }
-    line = chunk;
+    line = word;
   }
   if (line) lines.push(line);
   return lines;
 }
 
-function drawTextBlock(
-  ctx: CanvasRenderingContext2D,
-  lines: string[],
-  x: number,
-  y: number,
-  lineHeight: number,
-): number {
-  ctx.textBaseline = "alphabetic";
-  ctx.textAlign = "left";
-  let cursor = y;
-  for (const line of lines) {
-    ctx.fillText(line, x, cursor);
-    cursor += lineHeight;
-  }
-  return cursor;
-}
-
-type PriceColumn = {
-  label: string;
-  amount: string;
-  bonus: string;
-  highlight?: boolean;
-  strike?: boolean;
-};
-
-function drawPriceColumn(
+function fillRound(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  width: number,
-  height: number,
-  column: PriceColumn,
+  w: number,
+  h: number,
+  r: number,
+  fill: string,
+  stroke?: string,
+  lineWidth = 2,
 ) {
-  roundRect(ctx, x, y, width, height, 16);
-  ctx.fillStyle = column.highlight ? "rgba(2, 179, 164, 0.08)" : "rgba(26, 26, 26, 0.03)";
+  roundRect(ctx, x, y, w, h, r);
+  ctx.fillStyle = fill;
   ctx.fill();
-  ctx.strokeStyle = column.highlight ? COLORS.cardBorder : "rgba(26, 26, 26, 0.1)";
-  ctx.lineWidth = 1.5;
-  roundRect(ctx, x, y, width, height, 16);
-  ctx.stroke();
-
-  const pad = 28;
-  const cx = x + pad;
-  const innerW = width - pad * 2;
-
-  ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-
-  ctx.font = `600 14px ${FONT}`;
-  ctx.fillStyle = column.highlight ? COLORS.primary : COLORS.dim;
-  ctx.fillText(column.label.toUpperCase(), cx, y + 40);
-
-  ctx.font = `700 48px ${FONT}`;
-  ctx.fillStyle = column.highlight ? COLORS.white : COLORS.dim;
-  const amountY = y + 92;
-  if (column.strike) {
-    ctx.fillText(column.amount, cx, amountY);
-    const amountW = ctx.measureText(column.amount).width;
-    ctx.strokeStyle = COLORS.dim;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(cx, amountY - 18);
-    ctx.lineTo(cx + amountW, amountY - 18);
+  if (stroke) {
+    roundRect(ctx, x, y, w, h, r);
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = lineWidth;
     ctx.stroke();
-  } else {
-    ctx.fillText(column.amount, cx, amountY);
   }
-
-  ctx.font = `500 18px ${FONT}`;
-  ctx.fillStyle = column.highlight ? COLORS.primary : COLORS.muted;
-  const bonusLines = wrapText(ctx, column.bonus, innerW);
-  drawTextBlock(ctx, bonusLines, cx, y + 128, 22);
 }
 
-export function downloadCouponImage(coupon: CouponImageInput): void {
+async function loadLogo(): Promise<HTMLImageElement | null> {
+  const img = new Image();
+  img.decoding = "async";
+  try {
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("logo"));
+      img.src = "/zerops-logo.svg";
+    });
+    return img;
+  } catch {
+    return null;
+  }
+}
+
+export async function downloadCouponImage(coupon: CouponImageInput): Promise<void> {
+  if (document.fonts?.ready) await document.fonts.ready;
+  const logo = await loadLogo();
+
   const width = 1200;
-  const height = 800;
+  const height = 780;
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width * SCALE;
+  canvas.height = height * SCALE;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
+  ctx.scale(SCALE, SCALE);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
-  const frame = { x: 56, y: 56, w: width - 112, h: height - 112 };
-  const inner = {
-    left: frame.x + 56,
-    right: frame.x + frame.w - 56,
-    top: frame.y + 56,
-    width: frame.w - 112,
-  };
+  const frame = { x: 48, y: 48, w: width - 96, h: height - 96 };
+  const left = frame.x + 52;
+  const innerW = frame.w - 104;
 
-  const bg = ctx.createLinearGradient(0, 0, width, height);
-  bg.addColorStop(0, "#f4f6f8");
-  bg.addColorStop(1, COLORS.bg);
-  ctx.fillStyle = bg;
+  const page = ctx.createLinearGradient(0, 0, width, height);
+  page.addColorStop(0, COLORS.pageFrom);
+  page.addColorStop(1, COLORS.pageTo);
+  ctx.fillStyle = page;
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(15, 23, 42, 0.08)";
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 10;
+  fillRound(ctx, frame.x, frame.y, frame.w, frame.h, 28, COLORS.card);
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
   roundRect(ctx, frame.x, frame.y, frame.w, frame.h, 28);
-  ctx.fill();
   ctx.strokeStyle = COLORS.cardBorder;
   ctx.lineWidth = 2;
-  roundRect(ctx, frame.x, frame.y, frame.w, frame.h, 28);
   ctx.stroke();
 
-  let y = inner.top;
+  let y = frame.y + 40;
 
-  ctx.font = `600 13px ${FONT}`;
-  ctx.fillStyle = COLORS.primary;
+  if (logo) {
+    ctx.drawImage(logo, left, y, 36, 43);
+  }
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
-  ctx.fillText("ZEROPS WORKSHOP COUPON", inner.left, y + 14);
-  y += 36;
+  ctx.font = `600 22px ${FONT}`;
+  ctx.fillStyle = COLORS.ink;
+  ctx.fillText("Zerops", left + (logo ? 48 : 0), y + 30);
 
-  const codeBoxH = 96;
-  roundRect(ctx, inner.left, y, 360, codeBoxH, 16);
-  ctx.fillStyle = "rgba(2, 179, 164, 0.08)";
-  ctx.fill();
-  ctx.strokeStyle = COLORS.cardBorder;
-  ctx.lineWidth = 2;
-  roundRect(ctx, inner.left, y, 360, codeBoxH, 16);
-  ctx.stroke();
-
-  ctx.font = `500 12px ${FONT}`;
-  ctx.fillStyle = COLORS.muted;
-  ctx.fillText("YOUR CODE", inner.left + 28, y + 34);
-
-  ctx.font = `700 48px ${MONO}`;
+  ctx.textAlign = "right";
+  ctx.font = `600 13px ${FONT}`;
   ctx.fillStyle = COLORS.primary;
-  ctx.fillText(coupon.code, inner.left + 28, y + 78);
-  y += codeBoxH + 24;
+  ctx.letterSpacing = "0.16em";
+  ctx.fillText("WORKSHOP COUPON", left + innerW, y + 28);
+  ctx.letterSpacing = "0";
+  ctx.textAlign = "left";
 
-  ctx.font = `500 22px ${FONT}`;
+  y += 68;
+
+  const codeH = 168;
+  fillRound(ctx, left, y, innerW, codeH, 20, COLORS.codeFill, COLORS.cardBorder, 2.5);
+
+  ctx.textAlign = "center";
+  ctx.font = `600 13px ${FONT}`;
+  ctx.fillStyle = COLORS.muted;
+  ctx.letterSpacing = "0.18em";
+  ctx.fillText("YOUR CODE", left + innerW / 2, y + 42);
+  ctx.letterSpacing = "0.22em";
+  ctx.font = `700 72px ${MONO}`;
+  ctx.fillStyle = COLORS.primary;
+  ctx.fillText(coupon.code, left + innerW / 2, y + 118);
+  ctx.letterSpacing = "0";
+  ctx.textAlign = "left";
+
+  y += codeH + 28;
+
+  ctx.font = `500 20px ${FONT}`;
   ctx.fillStyle = COLORS.muted;
   const subtitle = wrapText(
     ctx,
     `Top up $${coupon.verificationPaymentUsd} to verify your account — coupon applied at checkout.`,
-    inner.width,
+    innerW,
   );
-  y = drawTextBlock(ctx, subtitle, inner.left, y + 20, 28) + 28;
+  for (const line of subtitle) {
+    ctx.fillText(line, left, y);
+    y += 28;
+  }
+  y += 16;
 
-  const colGap = 24;
-  const arrowW = 48;
-  const colW = Math.floor((inner.width - colGap * 2 - arrowW) / 2);
-  const colH = 176;
-  const colLeftX = inner.left;
-  const colRightX = inner.left + colW + colGap + arrowW;
+  const colGap = 20;
+  const arrowW = 56;
+  const colW = Math.floor((innerW - colGap * 2 - arrowW) / 2);
+  const colH = 148;
 
-  drawPriceColumn(ctx, colLeftX, y, colW, colH, {
-    label: "Usually",
-    amount: `$${coupon.defaultTotalUsd}`,
-    bonus: `$${coupon.defaultBonusUsd} bonus`,
-    strike: true,
-  });
+  fillRound(ctx, left, y, colW, colH, 16, COLORS.colFill, "rgba(26, 26, 26, 0.08)", 1.5);
+  ctx.font = `600 13px ${FONT}`;
+  ctx.fillStyle = COLORS.dim;
+  ctx.letterSpacing = "0.14em";
+  ctx.fillText("USUALLY", left + 28, y + 38);
+  ctx.letterSpacing = "0";
+  ctx.font = `700 44px ${FONT}`;
+  ctx.fillStyle = COLORS.dim;
+  const usual = `$${coupon.defaultTotalUsd}`;
+  ctx.fillText(usual, left + 28, y + 90);
+  const usualW = ctx.measureText(usual).width;
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(left + 28, y + 74);
+  ctx.lineTo(left + 28 + usualW, y + 74);
+  ctx.stroke();
+  ctx.font = `500 16px ${FONT}`;
+  ctx.fillStyle = COLORS.muted;
+  ctx.fillText(`$${coupon.defaultBonusUsd} bonus`, left + 28, y + 122);
 
-  ctx.font = `500 28px ${FONT}`;
+  ctx.font = `600 32px ${FONT}`;
   ctx.fillStyle = COLORS.primary;
   ctx.textAlign = "center";
-  ctx.fillText("→", colLeftX + colW + colGap + arrowW / 2, y + colH / 2 + 10);
-
-  drawPriceColumn(ctx, colRightX, y, colW, colH, {
-    label: "With coupon",
-    amount: `$${coupon.workshopTotalUsd}`,
-    bonus: `$${coupon.workshopBonusUsd} bonus (not $${coupon.defaultBonusUsd})`,
-    highlight: true,
-  });
-
-  y += colH + 32;
-
-  const footerH = 156;
-  roundRect(ctx, inner.left, y, inner.width, footerH, 16);
-  ctx.fillStyle = COLORS.footerBg;
-  ctx.fill();
-
-  const footerPad = 28;
-  const footerTextW = inner.width - footerPad * 2;
-
+  ctx.fillText("→", left + colW + colGap + arrowW / 2, y + colH / 2 + 12);
   ctx.textAlign = "left";
-  ctx.font = `400 19px ${FONT}`;
-  ctx.fillStyle = "#d4d4d8";
+
+  const rightX = left + colW + colGap + arrowW;
+  fillRound(ctx, rightX, y, colW, colH, 16, COLORS.colHiFill, COLORS.cardBorder, 2);
+  ctx.font = `600 13px ${FONT}`;
+  ctx.fillStyle = COLORS.primary;
+  ctx.letterSpacing = "0.14em";
+  ctx.fillText("WITH COUPON", rightX + 28, y + 38);
+  ctx.letterSpacing = "0";
+  ctx.font = `700 44px ${FONT}`;
+  ctx.fillStyle = COLORS.ink;
+  ctx.fillText(`$${coupon.workshopTotalUsd}`, rightX + 28, y + 90);
+  ctx.font = `600 16px ${FONT}`;
+  ctx.fillStyle = COLORS.primary;
+  ctx.fillText(`$${coupon.workshopBonusUsd} bonus`, rightX + 28, y + 122);
+
+  y += colH + 24;
+
+  const footerH = frame.y + frame.h - 40 - y;
+  fillRound(ctx, left, y, innerW, footerH, 16, COLORS.footerFill);
+
+  const pad = 24;
+  ctx.font = `500 17px ${FONT}`;
+  ctx.fillStyle = COLORS.ink;
   const body = wrapText(
     ctx,
-    "You already have a Zerops account — open the promo link below to top up. The coupon is applied automatically.",
-    footerTextW,
+    "Already have a Zerops account — open the promo link below. The coupon is applied automatically.",
+    innerW - pad * 2,
   );
-  let footerY = drawTextBlock(ctx, body, inner.left + footerPad, y + 36, 26) + 18;
+  let footerY = y + 32;
+  for (const line of body) {
+    ctx.fillText(line, left + pad, footerY);
+    footerY += 24;
+  }
+  footerY += 10;
 
   const promoPath = couponPromoUrl(coupon.code).replace(/^https:\/\//, "");
-  ctx.font = `500 17px ${MONO}`;
-  const urlLines = wrapText(ctx, promoPath, footerTextW - 32);
-  const urlLineH = 22;
-  const urlBlockH = urlLines.length * urlLineH + 24;
-  roundRect(ctx, inner.left + footerPad, footerY, footerTextW, urlBlockH, 10);
-  ctx.fillStyle = COLORS.urlBg;
-  ctx.fill();
-  ctx.strokeStyle = "rgba(2, 179, 164, 0.28)";
-  ctx.lineWidth = 1;
-  roundRect(ctx, inner.left + footerPad, footerY, footerTextW, urlBlockH, 10);
-  ctx.stroke();
-
+  ctx.font = `500 18px ${MONO}`;
+  const urlH = 48;
+  fillRound(
+    ctx,
+    left + pad,
+    footerY,
+    innerW - pad * 2,
+    urlH,
+    10,
+    COLORS.urlFill,
+    "rgba(2, 179, 164, 0.35)",
+    1.5,
+  );
   ctx.fillStyle = COLORS.primary;
-  drawTextBlock(ctx, urlLines, inner.left + footerPad + 16, footerY + 28, urlLineH);
+  ctx.textBaseline = "middle";
+  ctx.fillText(promoPath, left + pad + 16, footerY + urlH / 2);
 
   canvas.toBlob((blob) => {
     if (!blob) return;

@@ -68,17 +68,27 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 
+  /* Match worker slideHtml palette so the live preview is a slide, not
+     unstyled black markdown on the page background. */
+  .slide-prose {
+    background: #14110e;
+    color: #f4efe6;
+  }
+
   .slide-prose h1 {
     @apply mb-3 text-2xl font-semibold tracking-tight sm:text-3xl;
+    color: #f4efe6;
   }
 
   .slide-prose h2 {
     @apply mb-3 text-xl font-semibold tracking-tight sm:text-2xl;
+    color: #f4efe6;
   }
 
   .slide-prose p,
   .slide-prose li {
-    @apply text-sm leading-relaxed text-muted-foreground;
+    @apply text-sm leading-relaxed;
+    color: #c8bfb0;
   }
 
   .slide-prose ul {
@@ -86,7 +96,9 @@
   }
 
   .slide-prose code {
-    @apply rounded bg-muted px-1 py-0.5 font-mono text-[13px];
+    @apply rounded px-1 py-0.5 font-mono text-[13px];
+    background: #1d1914;
+    color: #f4efe6;
   }
 
   .inventory-prose {

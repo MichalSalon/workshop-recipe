@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { renderAllSlides } from "@deck/engine";
 import { contentHash, splitSlides } from "@deck/shared";
 
 describe("splitSlides", () => {
@@ -12,6 +13,16 @@ describe("splitSlides", () => {
 
   it("does not treat --- inside a paragraph as a divider", () => {
     expect(splitSlides("see a-b --- c")).toEqual(["see a-b --- c"]);
+  });
+});
+
+describe("stub renderer", () => {
+  it("paints a full-size slide instead of a 1×1 placeholder", async () => {
+    const [png] = await renderAllSlides(["# Deck Renderer\n\nSubmit markdown."], "stub", 0);
+    expect(png).toBeDefined();
+    expect(png!.readUInt32BE(16)).toBe(1920);
+    expect(png!.readUInt32BE(20)).toBe(1080);
+    expect(png!.byteLength).toBeGreaterThan(2000);
   });
 });
 

@@ -2,7 +2,6 @@ import { ArrowRight, ClipboardList } from "lucide-react";
 import { SiteLogo } from "@/SiteLogo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { LINKS } from "@/workshop-config";
 
 export type WorkshopNavPage = "home" | "prompts" | "capabilities";
 
@@ -27,9 +26,15 @@ export function WorkshopNav({
   return (
     <header className="relative z-10 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:max-w-5xl">
-        <a href={LINKS.zerops} target="_blank" rel="noreferrer" className="shrink-0 text-foreground">
-          <SiteLogo />
-        </a>
+        {onOpenHome ? (
+          <button type="button" onClick={onOpenHome} className="shrink-0 text-foreground">
+            <SiteLogo />
+          </button>
+        ) : (
+          <a href="/" className="shrink-0 text-foreground">
+            <SiteLogo />
+          </a>
+        )}
 
         <nav className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
           {variant === "full" ? (

@@ -480,7 +480,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
                       </Button>
                     </div>
                   </div>
-                  <div className="slide-prose mt-2 min-h-0 flex-1 overflow-auto rounded-md border border-border bg-muted p-4 sm:mt-3 sm:p-6">
+                  <div className="slide-prose mt-2 min-h-0 flex-1 overflow-auto rounded-md border border-border p-4 sm:mt-3 sm:p-6">
                     <div
                       dangerouslySetInnerHTML={{
                         __html: markdown.render(preview),
@@ -689,22 +689,47 @@ export function DeckApp({ onHome }: DeckAppProps) {
           <div className="grid grid-cols-2 gap-6 text-sm sm:gap-8">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Product</p>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.zerops}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.zerops}
+                target="_blank"
+                rel="noreferrer"
+              >
                 zerops.io
               </a>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.app}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.app}
+                target="_blank"
+                rel="noreferrer"
+              >
                 App
               </a>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.docs}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.docs}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Docs
               </a>
             </div>
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Community</p>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.discord}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.discord}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Discord
               </a>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.github}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.github}
+                target="_blank"
+                rel="noreferrer"
+              >
                 GitHub
               </a>
             </div>

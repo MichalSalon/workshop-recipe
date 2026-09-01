@@ -3,19 +3,25 @@ import { PDFDocument, rgb } from "pdf-lib";
 import MarkdownIt from "markdown-it";
 import type { Page } from "playwright";
 import { slideHtml } from "@deck/shared";
+import { renderStubSlidePng, STUB_SLIDE_HEIGHT, STUB_SLIDE_WIDTH } from "./stub-png.js";
 
 const markdown = new MarkdownIt({ html: false, linkify: false });
 
-const SLIDE_WIDTH = 1920;
-const SLIDE_HEIGHT = 1080;
+const SLIDE_WIDTH = STUB_SLIDE_WIDTH;
+const SLIDE_HEIGHT = STUB_SLIDE_HEIGHT;
 const SLIDE_BG = rgb(20 / 255, 17 / 255, 14 / 255);
 
-// Opaque 1×1 RGB (#14110e). The old stub was 1×1 RGBA and looked white
-// when upscaled into a PDF page.
-export const STUB_PNG = Buffer.from(
-  "89504e470d0a1a0a0000000d4948445200000001000000010802000000907753de0000000c49444154789c631011e403000070003499c8d26e0000000049454e44ae426082",
-  "hex",
-);
+const LOCAL_CHROME_CANDIDATES = [
+  "/usr/bin/google-chrome-stable",
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+];
+
+export function resolveChromiumPath(
+  env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  const candidates = [env.CHROMIUM_PATH, ...LOCAL_CHROME_CANDIDATES];
+  return candidates.find((path): path is string => Boolean(path) && existsSync(path));
+}
 
 export type RenderDriver = "stub" | "chromium";
 
@@ -52,10 +58,10 @@ export function renderSlideHtml(source: string, index: number, total: number): s
 
 async function launchChromium() {
   const { chromium } = await import("playwright");
-  const executablePath = process.env.CHROMIUM_PATH;
-  if (!executablePath || !existsSync(executablePath)) {
+  const executablePath = resolveChromiumPath();
+  if (!executablePath) {
     throw new Error(
-      `CHROMIUM_PATH is missing or not found (${executablePath ?? "unset"})`,
+      `CHROMIUM_PATH is missing or not found (${process.env.CHROMIUM_PATH ?? "unset"})`,
     );
   }
   return chromium.launch({
@@ -84,9 +90,9 @@ export async function renderAllSlides(
   spinMs: number,
 ): Promise<Buffer[]> {
   if (driver !== "chromium") {
-    return slides.map(() => {
+    return slides.map((source, index) => {
       if (spinMs > 0) spin(spinMs);
-      return STUB_PNG;
+      return renderStubSlidePng(source, index, slides.length);
     });
   }
 

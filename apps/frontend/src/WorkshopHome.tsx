@@ -143,22 +143,47 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts, onOpenCapabilities }: W
           <div className="grid grid-cols-2 gap-8 text-sm">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Product</p>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.zerops}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.zerops}
+                target="_blank"
+                rel="noreferrer"
+              >
                 zerops.io
               </a>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.app}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.app}
+                target="_blank"
+                rel="noreferrer"
+              >
                 App
               </a>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.docs}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.docs}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Docs
               </a>
             </div>
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Community</p>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.discord}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.discord}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Discord
               </a>
-              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.github}>
+              <a
+                className="block text-muted-foreground hover:text-foreground"
+                href={LINKS.github}
+                target="_blank"
+                rel="noreferrer"
+              >
                 GitHub
               </a>
             </div>
