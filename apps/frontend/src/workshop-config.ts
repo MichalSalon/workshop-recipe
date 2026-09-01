@@ -40,6 +40,7 @@ export const LINKS = {
   recipeDocs: "https://docs.zerops.io/recipes",
   discord: "https://discord.gg/zeropsio",
   github: "https://github.com/zeropsio",
+  capabilityGist: "https://gist.github.com/fxck/abb186df2df39e672063baa6273c7de1",
 } as const;
 
 /** Workshop floor QR targets — build track vs capability inventory. */

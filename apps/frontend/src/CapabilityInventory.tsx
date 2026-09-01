@@ -3,6 +3,7 @@ import MarkdownIt from "markdown-it";
 import inventoryMarkdown from "@/content/zerops-capability-inventory.md?raw";
 import { AskAgentLinks } from "@/components/AskAgentLinks";
 import { WorkshopNav } from "@/components/WorkshopNav";
+import { LINKS } from "@/workshop-config";
 
 const markdown = new MarkdownIt({ html: false, linkify: true });
 
@@ -31,7 +32,17 @@ export function CapabilityInventory({ onOpenHome, onOpenPrompts, onOpenApp }: Ca
 
       <main className="relative z-10 mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">Static markdown · August 2026</p>
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">Static markdown · August 2026</p>
+            <a
+              href={LINKS.capabilityGist}
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-xs text-primary underline-offset-4 hover:underline"
+            >
+              gist.github.com/fxck/abb186df2df39e672063baa6273c7de1
+            </a>
+          </div>
           <AskAgentLinks />
         </div>
 
