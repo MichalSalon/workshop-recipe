@@ -32,25 +32,25 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.17 0.008 250);
-  --foreground: oklch(0.97 0.004 250);
-  --card: oklch(0.2 0.01 250);
-  --card-foreground: oklch(0.97 0.004 250);
-  --popover: oklch(0.2 0.01 250);
-  --popover-foreground: oklch(0.97 0.004 250);
-  --primary: oklch(0.72 0.1 181);
+  --background: oklch(0.955 0.006 250);
+  --foreground: oklch(0.22 0.012 250);
+  --card: oklch(0.995 0.002 250);
+  --card-foreground: oklch(0.22 0.012 250);
+  --popover: oklch(0.995 0.002 250);
+  --popover-foreground: oklch(0.22 0.012 250);
+  --primary: oklch(0.68 0.11 181);
   --primary-foreground: oklch(0.18 0.03 200);
-  --secondary: oklch(0.26 0.01 250);
-  --secondary-foreground: oklch(0.97 0.004 250);
-  --muted: oklch(0.26 0.01 250);
-  --muted-foreground: oklch(0.72 0.015 250);
-  --accent: oklch(0.28 0.012 250);
-  --accent-foreground: oklch(0.97 0.004 250);
-  --destructive: oklch(0.63 0.2 25);
+  --secondary: oklch(0.93 0.008 250);
+  --secondary-foreground: oklch(0.22 0.012 250);
+  --muted: oklch(0.93 0.008 250);
+  --muted-foreground: oklch(0.48 0.015 250);
+  --accent: oklch(0.93 0.012 181);
+  --accent-foreground: oklch(0.22 0.012 250);
+  --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.72 0.1 181);
+  --border: oklch(0.22 0.012 250 / 12%);
+  --input: oklch(0.22 0.012 250 / 14%);
+  --ring: oklch(0.68 0.11 181);
 }
 
 @layer base {
@@ -78,7 +78,7 @@
 
   .slide-prose p,
   .slide-prose li {
-    @apply text-sm leading-relaxed text-zinc-300;
+    @apply text-sm leading-relaxed text-muted-foreground;
   }
 
   .slide-prose ul {
@@ -86,11 +86,11 @@
   }
 
   .slide-prose code {
-    @apply rounded bg-white/10 px-1 py-0.5 font-mono text-[13px];
+    @apply rounded bg-muted px-1 py-0.5 font-mono text-[13px];
   }
 
   .inventory-prose {
-    @apply text-[15px] leading-relaxed text-zinc-300;
+    @apply text-[15px] leading-relaxed text-muted-foreground;
   }
 
   .inventory-prose > *:first-child {
@@ -98,15 +98,15 @@
   }
 
   .inventory-prose h1 {
-    @apply mb-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl;
+    @apply mb-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl;
   }
 
   .inventory-prose h2 {
-    @apply mb-3 mt-12 text-xl font-semibold tracking-tight text-white sm:text-2xl;
+    @apply mb-3 mt-12 text-xl font-semibold tracking-tight text-foreground sm:text-2xl;
   }
 
   .inventory-prose h3 {
-    @apply mb-2 mt-8 text-lg font-semibold text-white;
+    @apply mb-2 mt-8 text-lg font-semibold text-foreground;
   }
 
   .inventory-prose p,
@@ -123,11 +123,11 @@
   }
 
   .inventory-prose strong {
-    @apply font-semibold text-white;
+    @apply font-semibold text-foreground;
   }
 
   .inventory-prose code {
-    @apply rounded bg-white/10 px-1 py-0.5 font-mono text-[13px] text-zinc-100;
+    @apply rounded bg-muted px-1 py-0.5 font-mono text-[13px] text-foreground;
   }
 
   .inventory-prose a {
@@ -135,11 +135,11 @@
   }
 
   .inventory-prose blockquote {
-    @apply my-6 border-l-2 border-primary/50 pl-4 text-zinc-200;
+    @apply my-6 border-l-2 border-primary/50 pl-4 text-foreground;
   }
 
   .inventory-prose hr {
-    @apply my-10 border-white/10;
+    @apply my-10 border-border;
   }
 
   .inventory-prose table {
@@ -147,10 +147,10 @@
   }
 
   .inventory-prose th {
-    @apply border-b border-white/15 pb-2 pr-3 font-semibold text-white;
+    @apply border-b border-border pb-2 pr-3 font-semibold text-foreground;
   }
 
   .inventory-prose td {
-    @apply border-b border-white/10 py-2 pr-3 align-top text-zinc-300;
+    @apply border-b border-border py-2 pr-3 align-top text-muted-foreground;
   }
 }

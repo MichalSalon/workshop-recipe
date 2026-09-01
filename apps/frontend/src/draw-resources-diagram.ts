@@ -9,20 +9,20 @@ import type { RecipeServiceConfig, ResourceStackConfig } from "@/lib/diagram-typ
 import { containerCount, displayServices } from "@/lib/workshop-resources";
 
 const COLORS = {
-  coreBg: "#082335",
-  coreTitle: "#64b5ff",
-  serviceBg: "rgba(255, 255, 255, 0.04)",
-  serviceFlaggedBg: "rgba(245, 158, 11, 0.12)",
-  serviceFlaggedBorder: "rgba(245, 158, 11, 0.45)",
-  hostname: "#e9eeec",
-  type: "#9faea9",
-  resourceNum: "#e9eeec",
-  resourceUnit: "rgba(233, 238, 236, 0.7)",
-  resourceLabel: "#9faea9",
-  containerDot: "#56d364",
-  price: "#66bb6a",
-  separator: "rgba(255, 255, 255, 0.12)",
-  sumIcon: "rgba(159, 174, 169, 0.35)",
+  coreBg: "#02b3a4",
+  coreTitle: "#ffffff",
+  serviceBg: "#ffffff",
+  serviceFlaggedBg: "#fffbeb",
+  serviceFlaggedBorder: "#f59e0b",
+  hostname: "#1a1a1a",
+  type: "#64748b",
+  resourceNum: "#1a1a1a",
+  resourceUnit: "rgba(26, 26, 26, 0.7)",
+  resourceLabel: "#64748b",
+  containerDot: "#02b3a4",
+  price: "#15803d",
+  separator: "rgba(26, 26, 26, 0.12)",
+  sumIcon: "rgba(100, 116, 139, 0.45)",
   badgeBg: "#f59e0b",
   badgeText: "#451a03",
 } as const;
@@ -559,6 +559,8 @@ export function drawResourcesDiagram(ctx: CanvasRenderingContext2D, options: Dra
   const centerX = width / 2;
 
   ctx.clearRect(0, 0, width, layout.height);
+  ctx.fillStyle = "#eceff3";
+  ctx.fillRect(0, 0, width, layout.height);
 
   let y = layout.pad;
   drawCoreBlock(ctx, config.projectMode, centerX, y, layout.coreW);

@@ -17,12 +17,12 @@ export function WorkshopStack({ className }: WorkshopStackProps) {
     <ul className={cn("grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6", className)}>
       {STACK.map(({ name, role }) => (
         <li key={name}>
-          <Card className="h-full border-white/10 bg-[#161922]/80 shadow-none">
+          <Card className="h-full border-border bg-card shadow-none">
             <CardHeader className="space-y-2 pb-2">
               <CardTitle className="font-mono text-sm font-medium text-primary">{name}</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-zinc-400">{role}</CardDescription>
+              <CardDescription className="text-muted-foreground">{role}</CardDescription>
             </CardContent>
           </Card>
         </li>

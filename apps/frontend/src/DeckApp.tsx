@@ -300,19 +300,19 @@ export function DeckApp({ onHome }: DeckAppProps) {
   }
 
   return (
-    <div className="min-h-svh overflow-x-hidden bg-[#1b1d21]">
-      <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white text-zinc-950">
+    <div className="min-h-svh overflow-x-hidden bg-background">
+      <header className="sticky top-0 z-20 border-b border-border bg-background text-foreground">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:max-w-[1200px]">
           {onHome ? (
             <button
               type="button"
               onClick={onHome}
-              className="flex items-center gap-2.5 text-zinc-950"
+              className="flex items-center gap-2.5 text-foreground"
             >
               <SiteLogo markClassName="size-8" />
             </button>
           ) : (
-            <a href="/" className="flex items-center gap-2.5 text-zinc-950">
+            <a href="/" className="flex items-center gap-2.5 text-foreground">
               <SiteLogo markClassName="size-8" />
             </a>
           )}
@@ -320,14 +320,14 @@ export function DeckApp({ onHome }: DeckAppProps) {
             <button
               type="button"
               onClick={onHome}
-              className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               Workshop
             </button>
           ) : (
             <a
               href="/"
-              className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               Workshop
             </a>
@@ -336,21 +336,21 @@ export function DeckApp({ onHome }: DeckAppProps) {
       </header>
 
       <section className="px-4 pb-4 pt-8 text-center sm:px-6 sm:pb-6 sm:pt-14 lg:pt-16">
-        <h1 className="text-balance text-2xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+        <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
           Turn your Markdown into a slide deck
         </h1>
-        <p className="mx-auto mt-2 max-w-2xl text-sm text-zinc-400 sm:mt-3 sm:text-base">
+        <p className="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground sm:mt-3 sm:text-base">
           Workers on Zerops render each section to PNG and PDF. The queue in
           this tab is live because the work is not.
         </p>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-10 sm:pb-16 sm:px-6 lg:max-w-[1200px]">
-        <div className="overflow-hidden rounded-lg border border-white/10 bg-[#111317] shadow-2xl sm:rounded-xl">
-          <div className="flex flex-col gap-3 border-b border-white/10 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-2.5">
-            <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400 sm:gap-3">
+        <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm sm:rounded-xl">
+          <div className="flex flex-col gap-3 border-b border-border px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-2.5">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground sm:gap-3">
               <span className="text-xs sm:text-sm">Markdown → slides</span>
-              <span className="hidden h-4 w-px bg-white/10 md:block" />
+              <span className="hidden h-4 w-px bg-border md:block" />
               <span className="hidden items-center gap-1.5 md:flex">
                 <Layers className="size-3.5 text-primary" />
                 <span className="tabular-nums text-primary">{depth}</span>
@@ -435,7 +435,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
 
           <div>
             <div className="grid min-h-[min(60dvh,30rem)] md:grid-cols-2">
-                <div className="flex min-h-[min(40dvh,20rem)] flex-col border-b border-white/10 md:min-h-[min(80dvh,34rem)] md:border-b-0 md:border-r md:border-white/10">
+                <div className="flex min-h-[min(40dvh,20rem)] flex-col border-b border-border md:min-h-[min(80dvh,34rem)] md:border-b-0 md:border-r md:border-border">
                   <label className="sr-only" htmlFor="deck">
                     Markdown deck
                   </label>
@@ -451,7 +451,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
 
                 <aside className="flex min-h-[min(40dvh,20rem)] flex-col p-3 sm:p-4 md:min-h-[min(80dvh,34rem)]">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-semibold text-white">Live preview</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Live preview</h3>
                     <div className="flex items-center gap-1">
                       <Button
                         type="button"
@@ -463,7 +463,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
                       >
                         <ChevronLeft />
                       </Button>
-                      <span className="min-w-10 text-center text-xs tabular-nums text-zinc-500 sm:min-w-12">
+                      <span className="min-w-10 text-center text-xs tabular-nums text-muted-foreground sm:min-w-12">
                         {previewIndex + 1} / {drafts.length}
                       </span>
                       <Button
@@ -480,7 +480,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
                       </Button>
                     </div>
                   </div>
-                  <div className="slide-prose mt-2 min-h-0 flex-1 overflow-auto rounded-md border border-white/10 bg-black/40 p-4 sm:mt-3 sm:p-6">
+                  <div className="slide-prose mt-2 min-h-0 flex-1 overflow-auto rounded-md border border-border bg-muted p-4 sm:mt-3 sm:p-6">
                     <div
                       dangerouslySetInnerHTML={{
                         __html: markdown.render(preview),
@@ -490,14 +490,14 @@ export function DeckApp({ onHome }: DeckAppProps) {
                 </aside>
             </div>
 
-            <aside className="border-t border-white/10 p-4 text-sm leading-relaxed text-zinc-300 sm:p-6">
-                <h2 className="text-base font-semibold text-white">
+            <aside className="border-t border-border p-4 text-sm leading-relaxed text-muted-foreground sm:p-6">
+                <h2 className="text-base font-semibold text-foreground">
                   Markdown → presentation
                 </h2>
-                <p className="mt-2 text-zinc-400">{note}</p>
+                <p className="mt-2 text-muted-foreground">{note}</p>
 
                 <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-between text-xs text-zinc-500">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>
                       {slideCount
                         ? `${progress} / ${slideCount} rendered`
@@ -508,24 +508,24 @@ export function DeckApp({ onHome }: DeckAppProps) {
                   <Progress value={ratio} />
                 </div>
 
-                <div className="mt-5 rounded-md border border-white/10 bg-black/30 p-3 sm:p-4">
+                <div className="mt-5 rounded-md border border-border bg-muted p-3 sm:p-4">
                   <div className="flex items-baseline justify-between gap-3">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                       Render benchmark
                     </span>
-                    <span className="font-mono text-[10px] text-zinc-600">
+                    <span className="font-mono text-[10px] text-muted-foreground">
                       submit → done
                     </span>
                   </div>
 
                   <div className="mt-2 flex flex-wrap items-baseline gap-x-6 gap-y-1">
-                    <span className="font-mono text-2xl tabular-nums text-white">
+                    <span className="font-mono text-2xl tabular-nums text-foreground">
                       {formatDuration(elapsedMs)}
                     </span>
                     {slideCount > 0 && elapsedMs > 0 ? (
-                      <span className="font-mono text-xs tabular-nums text-zinc-400">
+                      <span className="font-mono text-xs tabular-nums text-muted-foreground">
                         {(elapsedMs / slideCount).toFixed(0)} ms/slide
-                        <span className="mx-2 text-zinc-700">·</span>
+                        <span className="mx-2 text-muted-foreground">·</span>
                         {(slideCount / (elapsedMs / 1000)).toFixed(2)} slides/s
                       </span>
                     ) : null}
@@ -537,27 +537,27 @@ export function DeckApp({ onHome }: DeckAppProps) {
                   </div>
 
                   {runs.length > 0 ? (
-                    <div className="mt-3 border-t border-white/10 pt-2">
-                      <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">
+                    <div className="mt-3 border-t border-border pt-2">
+                      <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                         Recent runs
                       </div>
                       <ul className="mt-1.5 space-y-1">
                         {runs.map((run) => (
                           <li
                             key={run.at}
-                            className="flex items-baseline justify-between gap-3 font-mono text-xs tabular-nums text-zinc-400"
+                            className="flex items-baseline justify-between gap-3 font-mono text-xs tabular-nums text-muted-foreground"
                           >
                             <span>{run.slides} slides</span>
-                            <span className="h-px flex-1 self-center bg-white/5" />
-                            <span className="text-zinc-200">{formatDuration(run.ms)}</span>
-                            <span className="w-20 text-right text-zinc-500">
+                            <span className="h-px flex-1 self-center bg-border" />
+                            <span className="text-foreground">{formatDuration(run.ms)}</span>
+                            <span className="w-20 text-right text-muted-foreground">
                               {(run.ms / run.slides).toFixed(0)} ms/slide
                             </span>
                           </li>
                         ))}
                       </ul>
-                      <p className="mt-2 text-[11px] leading-snug text-zinc-500">
-                        Scale <code className="text-zinc-400">worker</code> and run again —
+                      <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+                        Scale <code className="text-muted-foreground">worker</code> and run again —
                         compare ms/slide to see whether the extra containers actually
                         helped.
                       </p>
@@ -565,41 +565,41 @@ export function DeckApp({ onHome }: DeckAppProps) {
                   ) : null}
                 </div>
 
-                <h3 className="mt-6 font-semibold text-white">Separate slides</h3>
-                <p className="mt-1 text-zinc-400">
+                <h3 className="mt-6 font-semibold text-foreground">Separate slides</h3>
+                <p className="mt-1 text-muted-foreground">
                   Use a line that is only <code className="text-primary">---</code>{" "}
                   between slides. The worker renders what you typed — no outbound
                   fetches.
                 </p>
-                <pre className="mt-3 overflow-x-auto rounded-md bg-black/40 px-3 py-2 font-mono text-xs text-zinc-200">
+                <pre className="mt-3 overflow-x-auto rounded-md bg-muted px-3 py-2 font-mono text-xs text-foreground">
                   {`# Title slide\n\n---\n\n## Second slide`}
                 </pre>
 
-                <h3 className="mt-6 font-semibold text-white">Markdown syntax</h3>
+                <h3 className="mt-6 font-semibold text-foreground">Markdown syntax</h3>
                 <div className="-mx-1 overflow-x-auto px-1">
                   <table className="mt-2 w-full min-w-[16rem] text-left text-xs">
-                  <thead className="text-zinc-500">
+                  <thead className="text-muted-foreground">
                     <tr>
                       <th className="py-1 font-medium">Markdown</th>
                       <th className="py-1 font-medium">Output</th>
                     </tr>
                   </thead>
-                  <tbody className="text-zinc-300">
-                    <tr className="border-t border-white/10">
+                  <tbody className="text-muted-foreground">
+                    <tr className="border-t border-border">
                       <td className="py-1.5 font-mono"># Heading 1</td>
                       <td>Title</td>
                     </tr>
-                    <tr className="border-t border-white/10">
+                    <tr className="border-t border-border">
                       <td className="py-1.5 font-mono">## Heading 2</td>
                       <td>Section</td>
                     </tr>
-                    <tr className="border-t border-white/10">
+                    <tr className="border-t border-border">
                       <td className="py-1.5 font-mono">**bold**</td>
                       <td>
                         <strong>bold</strong>
                       </td>
                     </tr>
-                    <tr className="border-t border-white/10">
+                    <tr className="border-t border-border">
                       <td className="py-1.5 font-mono">`code`</td>
                       <td>
                         <code>code</code>
@@ -611,7 +611,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
 
                 {done && jobId ? (
                   <div className="mt-6 space-y-3">
-                    <p className="text-zinc-400">
+                    <p className="text-muted-foreground">
                       Rendered output — use Preview in the toolbar for full size, then download.
                     </p>
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -620,7 +620,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
                           key={index}
                           type="button"
                           onClick={() => openRenderPreview(index)}
-                          className="overflow-hidden rounded-md border border-white/10 transition hover:border-primary/50"
+                          className="overflow-hidden rounded-md border border-border transition hover:border-primary/50"
                         >
                           <img
                             alt={`Slide ${index + 1}`}
@@ -637,12 +637,12 @@ export function DeckApp({ onHome }: DeckAppProps) {
         </div>
       </section>
 
-      <section className="border-t border-white/10 bg-[#14161a] px-4 py-10 sm:px-6 sm:py-16">
+      <section className="border-t border-border bg-muted px-4 py-10 sm:px-6 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-8 sm:gap-10 md:grid-cols-2 lg:max-w-[1200px]">
           <div>
-            <h2 className="text-lg font-semibold text-white sm:text-xl">About this tool</h2>
-            <p className="mt-3 max-w-prose text-sm leading-relaxed text-zinc-400">
-              Paste Markdown, split slides on <code className="text-zinc-200">---</code>,
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">About this tool</h2>
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted-foreground">
+              Paste Markdown, split slides on <code className="text-foreground">---</code>,
               and send the job to workers running on{" "}
               <a
                 href={LINKS.zerops}
@@ -656,55 +656,55 @@ export function DeckApp({ onHome }: DeckAppProps) {
               WebSocket.
             </p>
           </div>
-          <ol className="space-y-3 text-sm text-zinc-300">
+          <ol className="space-y-3 text-sm text-muted-foreground">
             <li>
-              <span className="font-medium text-white">1. Write slides</span>
-              <p className="text-zinc-400">Markdown in the editor with live preview beside it.</p>
+              <span className="font-medium text-foreground">1. Write slides</span>
+              <p className="text-muted-foreground">Markdown in the editor with live preview beside it.</p>
             </li>
             <li>
-              <span className="font-medium text-white">2. Create the deck</span>
-              <p className="text-zinc-400">
+              <span className="font-medium text-foreground">2. Create the deck</span>
+              <p className="text-muted-foreground">
                 Workers render each section to PNG, then a PDF.
               </p>
             </li>
             <li>
-              <span className="font-medium text-white">3. Preview & export</span>
-              <p className="text-zinc-400">Preview rendered slides, then download PNG or PDF.</p>
+              <span className="font-medium text-foreground">3. Preview & export</span>
+              <p className="text-muted-foreground">Preview rendered slides, then download PNG or PDF.</p>
             </li>
           </ol>
         </div>
       </section>
 
-      <footer className="border-t border-white/10 px-4 py-8 sm:px-6 sm:py-10">
+      <footer className="border-t border-border px-4 py-8 sm:px-6 sm:py-10">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:justify-between lg:max-w-[1200px]">
           {onHome ? (
-            <button type="button" onClick={onHome} className="flex items-center gap-2 text-white">
+            <button type="button" onClick={onHome} className="flex items-center gap-2 text-foreground">
               <SiteLogo />
             </button>
           ) : (
-            <a href="/" className="flex items-center gap-2 text-white">
+            <a href="/" className="flex items-center gap-2 text-foreground">
               <SiteLogo />
             </a>
           )}
           <div className="grid grid-cols-2 gap-6 text-sm sm:gap-8">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">Product</p>
-              <a className="block text-zinc-300 hover:text-white" href={LINKS.zerops}>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Product</p>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.zerops}>
                 zerops.io
               </a>
-              <a className="block text-zinc-300 hover:text-white" href={LINKS.app}>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.app}>
                 App
               </a>
-              <a className="block text-zinc-300 hover:text-white" href={LINKS.docs}>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.docs}>
                 Docs
               </a>
             </div>
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">Community</p>
-              <a className="block text-zinc-300 hover:text-white" href={LINKS.discord}>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Community</p>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.discord}>
                 Discord
               </a>
-              <a className="block text-zinc-300 hover:text-white" href={LINKS.github}>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.github}>
                 GitHub
               </a>
             </div>
@@ -721,7 +721,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
           onClick={() => setRenderPreviewOpen(false)}
         >
           <div
-            className="flex max-h-[100dvh] w-full max-w-5xl flex-col gap-3 overflow-y-auto rounded-t-xl bg-[#111317] p-4 sm:gap-4 sm:rounded-none sm:bg-transparent sm:p-0"
+            className="flex max-h-[100dvh] w-full max-w-5xl flex-col gap-3 overflow-y-auto rounded-t-xl bg-background p-4 sm:gap-4 sm:rounded-none sm:bg-transparent sm:p-0"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between text-white">
@@ -746,7 +746,7 @@ export function DeckApp({ onHome }: DeckAppProps) {
             <img
               alt={`Slide ${renderSlideIndex + 1}`}
               src={slideImageUrl(jobId, renderSlideIndex)}
-              className="max-h-[50dvh] w-full rounded-lg border border-white/10 object-contain sm:max-h-[65vh] lg:max-h-[70vh]"
+              className="max-h-[50dvh] w-full rounded-lg border border-border object-contain sm:max-h-[65vh] lg:max-h-[70vh]"
             />
 
             <div className="flex items-center justify-between gap-2 sm:justify-center sm:gap-4">
@@ -764,10 +764,10 @@ export function DeckApp({ onHome }: DeckAppProps) {
                 <span className="sr-only">Previous slide</span>
               </Button>
 
-              <p className="text-center text-xs text-zinc-500 sm:hidden">
+              <p className="text-center text-xs text-zinc-400 sm:hidden">
                 Swipe or use arrows · tap outside to close
               </p>
-              <p className="hidden text-center text-xs text-zinc-500 sm:block">
+              <p className="hidden text-center text-xs text-zinc-400 sm:block">
                 Arrow keys to navigate · Esc to close
               </p>
 

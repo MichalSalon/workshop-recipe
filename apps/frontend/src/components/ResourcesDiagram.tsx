@@ -55,5 +55,5 @@ export function ResourcesDiagram({ config, highlightOversized = false }: Resourc
 
 export function ResourcesCostSummary({ config }: { config: ResourceStackConfig }) {
   const cost = analyzeResourceConfig(config).cost;
-  return <span className="font-mono text-emerald-400">{formatMonthlyCost(cost)}/mo</span>;
+  return <span className="font-mono text-emerald-700">{formatMonthlyCost(cost)}/mo</span>;
 }

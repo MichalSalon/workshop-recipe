@@ -8,32 +8,34 @@ export type WorkshopPrompt = {
 export const WORKSHOP_PROMPTS: WorkshopPrompt[] = [
   {
     id: 1,
-    title: "Light Zerops theme",
-    text: `Switch the entire workshop frontend from dark theme to a light theme matching
-zerops.io: white/off-white backgrounds, Zerops teal accents, dark readable text,
-and the existing zerops-logo.svg. Layout and copy stay the same. Do not change
+    title: "Dark Zerops theme",
+    text: `Switch the entire workshop frontend from the current light theme to a dark
+theme: charcoal backgrounds, Zerops teal accents, light readable text, and
+the existing zerops-logo.svg. Layout and copy stay the same. Do not change
 API or worker behaviour.
 
-1. apps/frontend/src/styles.css — replace dark :root tokens with light ones
-   (background, foreground, card, primary teal, muted, border). Update .slide-prose
-   for dark-on-light.
+1. apps/frontend/src/styles.css — replace light :root tokens with dark ones
+   (background, foreground, card, primary teal, muted, border). Update
+   .slide-prose and .inventory-prose for light-on-dark.
 
-2. Replace hardcoded dark classes (bg-[#…], text-white, text-zinc-*, border-white/*,
-   bg-black/*) with semantic tokens: bg-background, bg-card, bg-muted, text-foreground,
-   text-muted-foreground, border-border, text-primary.
+2. Keep semantic tokens (bg-background, bg-card, text-foreground,
+   text-muted-foreground, border-border, text-primary). Flipping :root covers
+   most of the UI — do not reintroduce hardcoded bg-[#…] / text-white /
+   text-zinc-* on pages that already use tokens.
 
-3. Update every workshop UI file — partial light fixes leave broken contrast:
-   - WorkshopHome.tsx (/, hero, agenda cards, resources section, footer)
-   - DeckApp.tsx (/app, editor shell, preview, benchmark panel, about, footer, modal)
-   - CouponBanner.tsx (code box and pricing — no dark glass on light bg)
-   - WorkshopNav.tsx, WorkshopPrompts.tsx (/prompts), WorkshopStack.tsx
-   - ResourceOverprovisionBanner.tsx — amber alert must use dark text on light amber
-     (text-amber-950, bg-amber-50); pale amber-on-amber is unreadable
-   - draw-resources-diagram.ts — COLORS palette for light canvas (dark labels, light
-     service cards, teal core header); diagram must match the page background
+3. Update remaining light-only palettes — tokens alone will not fix these:
+   - ResourceOverprovisionBanner.tsx — amber alert on dark: dark amber panel
+     (bg-amber-950, text-amber-50); pale amber-on-amber is unreadable
+   - draw-resources-diagram.ts — COLORS for dark canvas (light labels, dark
+     service cards, teal core header); fill the canvas with the page background
+   - download-coupon-image.ts — coupon PNG COLORS for a dark card on charcoal
+   - WorkshopHome.tsx / WorkshopPrompts.tsx — grid overlay lines must be
+     light-on-dark (white at ~3% opacity), not the current dark hairlines
+   - apps/frontend/index.html — add class="dark" on <html>
 
-4. Verify /, /app, and /prompts look cohesive in light mode with readable text
-   everywhere, including the resources diagram and over-provision warning on dev.`,
+4. Verify /, /app, /prompts, and /capabilities look cohesive in dark mode
+   with readable text everywhere, including the resources diagram and
+   over-provision warning on dev.`,
   },
   {
     id: 2,

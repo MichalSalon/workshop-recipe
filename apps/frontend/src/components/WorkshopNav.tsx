@@ -15,7 +15,7 @@ type WorkshopNavProps = {
 };
 
 const navLink =
-  "rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-white";
+  "rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
 export function WorkshopNav({
   current,
@@ -25,9 +25,9 @@ export function WorkshopNav({
   onOpenApp,
 }: WorkshopNavProps) {
   return (
-    <header className="relative z-10 border-b border-white/10 bg-[#12141a]/80 backdrop-blur-md">
+    <header className="relative z-10 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:max-w-5xl">
-        <a href={LINKS.zerops} target="_blank" rel="noreferrer" className="shrink-0 text-white">
+        <a href={LINKS.zerops} target="_blank" rel="noreferrer" className="shrink-0 text-foreground">
           <SiteLogo />
         </a>
 
@@ -37,13 +37,13 @@ export function WorkshopNav({
               {onOpenHome ? (
                 <button
                   type="button"
-                  className={cn(navLink, current === "home" && "bg-white/5 text-white")}
+                  className={cn(navLink, current === "home" && "bg-muted text-foreground")}
                   onClick={onOpenHome}
                 >
                   Home
                 </button>
               ) : (
-                <a href="/" className={cn(navLink, current === "home" && "bg-white/5 text-white")}>
+                <a href="/" className={cn(navLink, current === "home" && "bg-muted text-foreground")}>
                   Home
                 </a>
               )}
@@ -54,7 +54,7 @@ export function WorkshopNav({
                   className={cn(
                     navLink,
                     "inline-flex items-center gap-1.5",
-                    current === "prompts" && "bg-white/5 text-white",
+                    current === "prompts" && "bg-muted text-foreground",
                   )}
                   onClick={onOpenPrompts}
                 >
@@ -68,7 +68,7 @@ export function WorkshopNav({
                   className={cn(
                     navLink,
                     "inline-flex items-center gap-1.5",
-                    current === "prompts" && "bg-white/5 text-white",
+                    current === "prompts" && "bg-muted text-foreground",
                   )}
                 >
                   <ClipboardList className="size-3.5" aria-hidden="true" />

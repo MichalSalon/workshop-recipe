@@ -13,15 +13,15 @@ const FONT = "Inter, system-ui, sans-serif";
 const MONO = "ui-monospace, SFMono-Regular, Menlo, monospace";
 
 const COLORS = {
-  bg: "#12141a",
-  card: "#161922",
-  cardBorder: "rgba(94, 234, 212, 0.28)",
-  primary: "#5eead4",
-  white: "#ffffff",
-  muted: "#a1a1aa",
-  dim: "#71717a",
-  footerBg: "rgba(0, 0, 0, 0.28)",
-  urlBg: "rgba(94, 234, 212, 0.1)",
+  bg: "#eceff3",
+  card: "#ffffff",
+  cardBorder: "rgba(2, 179, 164, 0.35)",
+  primary: "#02b3a4",
+  white: "#1a1a1a",
+  muted: "#64748b",
+  dim: "#94a3b8",
+  footerBg: "rgba(2, 179, 164, 0.08)",
+  urlBg: "rgba(2, 179, 164, 0.12)",
 } as const;
 
 function roundRect(
@@ -111,9 +111,9 @@ function drawPriceColumn(
   column: PriceColumn,
 ) {
   roundRect(ctx, x, y, width, height, 16);
-  ctx.fillStyle = column.highlight ? "rgba(94, 234, 212, 0.07)" : "rgba(255, 255, 255, 0.03)";
+  ctx.fillStyle = column.highlight ? "rgba(2, 179, 164, 0.08)" : "rgba(26, 26, 26, 0.03)";
   ctx.fill();
-  ctx.strokeStyle = column.highlight ? COLORS.cardBorder : "rgba(255, 255, 255, 0.08)";
+  ctx.strokeStyle = column.highlight ? COLORS.cardBorder : "rgba(26, 26, 26, 0.1)";
   ctx.lineWidth = 1.5;
   roundRect(ctx, x, y, width, height, 16);
   ctx.stroke();
@@ -169,12 +169,12 @@ export function downloadCouponImage(coupon: CouponImageInput): void {
   };
 
   const bg = ctx.createLinearGradient(0, 0, width, height);
-  bg.addColorStop(0, "#0f1115");
+  bg.addColorStop(0, "#f4f6f8");
   bg.addColorStop(1, COLORS.bg);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = "rgba(94, 234, 212, 0.06)";
+  ctx.fillStyle = "#ffffff";
   roundRect(ctx, frame.x, frame.y, frame.w, frame.h, 28);
   ctx.fill();
   ctx.strokeStyle = COLORS.cardBorder;
@@ -193,7 +193,7 @@ export function downloadCouponImage(coupon: CouponImageInput): void {
 
   const codeBoxH = 96;
   roundRect(ctx, inner.left, y, 360, codeBoxH, 16);
-  ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+  ctx.fillStyle = "rgba(2, 179, 164, 0.08)";
   ctx.fill();
   ctx.strokeStyle = COLORS.cardBorder;
   ctx.lineWidth = 2;
@@ -272,7 +272,7 @@ export function downloadCouponImage(coupon: CouponImageInput): void {
   roundRect(ctx, inner.left + footerPad, footerY, footerTextW, urlBlockH, 10);
   ctx.fillStyle = COLORS.urlBg;
   ctx.fill();
-  ctx.strokeStyle = "rgba(94, 234, 212, 0.22)";
+  ctx.strokeStyle = "rgba(2, 179, 164, 0.28)";
   ctx.lineWidth = 1;
   roundRect(ctx, inner.left + footerPad, footerY, footerTextW, urlBlockH, 10);
   ctx.stroke();

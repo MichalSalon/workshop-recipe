@@ -18,8 +18,8 @@ import { AGENDA, LINKS, WORKSHOP } from "@/workshop-config";
 
 const SECTION = "px-4 py-16 sm:px-6 lg:py-20";
 const CONTAINER = "mx-auto max-w-6xl lg:max-w-5xl";
-const SECTION_TITLE = "text-2xl font-semibold tracking-tight text-white sm:text-[1.625rem]";
-const SECTION_DESC = "mt-3 max-w-2xl text-base leading-relaxed text-zinc-400";
+const SECTION_TITLE = "text-2xl font-semibold tracking-tight text-foreground sm:text-[1.625rem]";
+const SECTION_DESC = "mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground";
 const SECTION_BODY = "mt-8";
 
 function SectionHeader({
@@ -39,7 +39,7 @@ function SectionHeader({
           {typeof description === "string" ? <p>{description}</p> : description}
         </div>
       </div>
-      {aside ? <p className="shrink-0 text-sm text-zinc-500">{aside}</p> : null}
+      {aside ? <p className="shrink-0 text-sm text-muted-foreground">{aside}</p> : null}
     </div>
   );
 }
@@ -55,14 +55,14 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts, onOpenCapabilities }: W
   const networkDiagram = recipeToNetworkDiagram(resourceConfig);
 
   return (
-    <div className="relative min-h-svh overflow-x-hidden bg-[#12141a] text-white">
+    <div className="relative min-h-svh overflow-x-hidden bg-background text-foreground">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(94,234,212,0.18),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(2,179,164,0.12),transparent)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(26,26,26,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(26,26,26,0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
       />
 
       <WorkshopNav
@@ -77,25 +77,25 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts, onOpenCapabilities }: W
             <h1 className="text-balance text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl lg:text-5xl">
               {WORKSHOP.title}
             </h1>
-            <p className="mt-4 text-lg text-zinc-400 sm:text-xl">{WORKSHOP.tagline}</p>
+            <p className="mt-4 text-lg text-muted-foreground sm:text-xl">{WORKSHOP.tagline}</p>
           </div>
 
           <WorkshopQrCodes className="mt-12 sm:mt-14" onOpenLearn={onOpenCapabilities} />
         </section>
 
-        <section className={`border-b border-white/10 bg-[#0f1115]/80 ${SECTION}`}>
+        <section className={`border-b border-border bg-muted/60 ${SECTION}`}>
           <div className={CONTAINER}>
             <SectionHeader
               title="Your Deck Renderer on Zerops"
               description="The same project topology as zerops.io — public endpoint, project core, L7 balancer, and every service this recipe deployed. Container counts come from your live resource config."
             />
-            <div className={`${SECTION_BODY} overflow-x-auto rounded-2xl bg-[#f2f2f2] px-3 py-8 sm:px-6`}>
+            <div className={`${SECTION_BODY} overflow-x-auto rounded-2xl bg-muted px-3 py-8 sm:px-6`}>
               <DeployedStackDiagram config={networkDiagram} />
             </div>
           </div>
         </section>
 
-        <section className={`border-y border-white/10 bg-[#0f1115]/80 ${SECTION}`}>
+        <section className={`border-y border-border bg-muted/60 ${SECTION}`}>
           <div className={CONTAINER}>
             <SectionHeader
               title="What you did"
@@ -106,13 +106,13 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts, onOpenCapabilities }: W
             <ol className={`${SECTION_BODY} grid gap-4 sm:grid-cols-2 lg:grid-cols-4`}>
               {AGENDA.map(({ step, title, body }) => (
                 <li key={step}>
-                  <Card className="h-full border-white/10 bg-[#161922]/80 shadow-none">
+                  <Card className="h-full border-border bg-card shadow-none">
                     <CardHeader className="space-y-3 pb-2">
                       <span className="font-mono text-xs text-primary">{step}</span>
-                      <CardTitle className="text-base text-white">{title}</CardTitle>
+                      <CardTitle className="text-base text-foreground">{title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription className="text-zinc-400">{body}</CardDescription>
+                      <CardDescription className="text-muted-foreground">{body}</CardDescription>
                     </CardContent>
                   </Card>
                 </li>
@@ -121,13 +121,13 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts, onOpenCapabilities }: W
           </div>
         </section>
 
-        <section id="coupon" className={`scroll-mt-20 border-b border-white/10 ${SECTION}`}>
+        <section id="coupon" className={`scroll-mt-20 border-b border-border ${SECTION}`}>
           <div className={CONTAINER}>
             <CouponBanner embedded />
           </div>
         </section>
 
-        <section className={`border-b border-white/10 bg-[#0f1115]/80 ${SECTION}`}>
+        <section className={`border-b border-border bg-muted/60 ${SECTION}`}>
           <div className={CONTAINER}>
             <WorkshopPillars />
           </div>
@@ -135,30 +135,30 @@ export function WorkshopHome({ onOpenApp, onOpenPrompts, onOpenCapabilities }: W
 
       </main>
 
-      <footer className={`relative z-10 border-t border-white/10 ${SECTION} pb-12 pt-10`}>
+      <footer className={`relative z-10 border-t border-border ${SECTION} pb-12 pt-10`}>
         <div className={`${CONTAINER} flex flex-col gap-8 sm:flex-row sm:justify-between`}>
-          <a href={LINKS.zerops} target="_blank" rel="noreferrer" className="text-white">
+          <a href={LINKS.zerops} target="_blank" rel="noreferrer" className="text-foreground">
             <SiteLogo />
           </a>
           <div className="grid grid-cols-2 gap-8 text-sm">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">Product</p>
-              <a className="block text-zinc-400 hover:text-white" href={LINKS.zerops}>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Product</p>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.zerops}>
                 zerops.io
               </a>
-              <a className="block text-zinc-400 hover:text-white" href={LINKS.app}>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.app}>
                 App
               </a>
-              <a className="block text-zinc-400 hover:text-white" href={LINKS.docs}>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.docs}>
                 Docs
               </a>
             </div>
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">Community</p>
-              <a className="block text-zinc-400 hover:text-white" href={LINKS.discord}>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Community</p>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.discord}>
                 Discord
               </a>
-              <a className="block text-zinc-400 hover:text-white" href={LINKS.github}>
+              <a className="block text-muted-foreground hover:text-foreground" href={LINKS.github}>
                 GitHub
               </a>
             </div>

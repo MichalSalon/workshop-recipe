@@ -70,14 +70,14 @@ export function WorkshopPrompts({ onOpenHome, onOpenApp }: WorkshopPromptsProps)
   }, []);
 
   return (
-    <div className="relative min-h-svh overflow-x-hidden bg-[#12141a] text-white">
+    <div className="relative min-h-svh overflow-x-hidden bg-background text-foreground">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(94,234,212,0.18),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(2,179,164,0.12),transparent)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(26,26,26,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(26,26,26,0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
       />
 
       <WorkshopNav current="prompts" onOpenHome={onOpenHome} onOpenApp={onOpenApp} />
@@ -94,7 +94,7 @@ export function WorkshopPrompts({ onOpenHome, onOpenApp }: WorkshopPromptsProps)
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
               <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">ZCP prompts</h1>
-              <p className="mt-3 text-base leading-relaxed text-zinc-400">
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
                 Copy-paste these into ZCP during the workshop. Each prompt is scoped so the agent
                 can finish in a few minutes without touching unrelated parts of the app.
               </p>
@@ -116,22 +116,22 @@ export function WorkshopPrompts({ onOpenHome, onOpenApp }: WorkshopPromptsProps)
           </div>
         </section>
 
-        <section className={`border-t border-white/10 bg-[#0f1115]/80 ${SECTION}`}>
+        <section className={`border-t border-border bg-muted/60 ${SECTION}`}>
           <div className={`${CONTAINER} space-y-6`}>
             {WORKSHOP_PROMPTS.map((prompt) => (
-              <Card key={prompt.id} className="border-white/10 bg-[#161922]/80 shadow-none">
+              <Card key={prompt.id} className="border-border bg-card shadow-none">
                 <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
                   <div className="space-y-1">
                     <p className="font-mono text-xs text-primary">{String(prompt.id).padStart(2, "0")}</p>
-                    <CardTitle className="text-lg text-white">{prompt.title}</CardTitle>
-                    <CardDescription className="text-zinc-500">
+                    <CardTitle className="text-lg text-foreground">{prompt.title}</CardTitle>
+                    <CardDescription className="text-muted-foreground">
                       Paste into ZCP and send — no edits needed.
                     </CardDescription>
                   </div>
                   <PromptCopyButton text={prompt.text} />
                 </CardHeader>
                 <CardContent>
-                  <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg border border-white/10 bg-[#12141a] p-4 font-mono text-sm leading-relaxed text-zinc-300">
+                  <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg border border-border bg-muted p-4 font-mono text-sm leading-relaxed text-foreground">
                     {prompt.text}
                   </pre>
                 </CardContent>

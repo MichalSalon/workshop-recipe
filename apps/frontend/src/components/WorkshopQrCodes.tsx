@@ -26,12 +26,12 @@ export function WorkshopQrCodes({ className, onOpenLearn }: WorkshopQrCodesProps
         return (
           <article
             key={entry.id}
-            className="flex flex-col items-center rounded-2xl border border-white/10 bg-[#161922]/80 px-6 py-8 text-center sm:px-8"
+            className="flex flex-col items-center rounded-2xl border border-border bg-card px-6 py-8 text-center sm:px-8"
           >
-            <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
               {entry.title}
             </h2>
-            <p className="mt-2 max-w-xs text-sm leading-relaxed text-zinc-400">
+            <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
               {entry.description}
             </p>
 

@@ -77,10 +77,10 @@ export function openInClaudeUrl(docUrl: string): string {
   return `https://claude.ai/new?q=${encodeURIComponent(`${ASK_INVENTORY}${docUrl}`)}`;
 }
 
-/** Promo top-up link — coupon code is URL-safe base64 without padding. */
+/** Promo link — coupon code is URL-safe base64 without padding. */
 export function couponPromoUrl(code: string): string {
   const encoded = btoa(code).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  return `https://app.zerops.io/promo/${encoded}/top-up`;
+  return `https://app.zerops.io/promo/${encoded}`;
 }
 
 export const AGENDA = [
@@ -102,7 +102,7 @@ export const AGENDA = [
   {
     step: "04",
     title: "Used ZCP prompts",
-    body: "Extended the app with three predefined ZCP prompts: light theme, live slide count, and basic auth.",
+    body: "Extended the app with three predefined ZCP prompts: dark theme, live slide count, and basic auth.",
   },
 ] as const;
 

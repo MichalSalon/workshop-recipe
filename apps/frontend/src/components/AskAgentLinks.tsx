@@ -47,6 +47,6 @@ export function AskAgentLinks({ className, compact = false }: AskAgentLinksProps
 
 function askClass(compact: boolean): string {
   return compact
-    ? "rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-300 transition-colors hover:border-primary/40 hover:text-white"
-    : "inline-flex h-8 items-center rounded-md border border-white/15 bg-white/5 px-3 text-xs font-medium text-zinc-200 transition-colors hover:border-primary/40 hover:text-white";
+    ? "rounded-full border border-border bg-background px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+    : "inline-flex h-8 items-center rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground";
 }
