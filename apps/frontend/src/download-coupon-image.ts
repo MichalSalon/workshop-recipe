@@ -111,7 +111,7 @@ export async function downloadCouponImage(coupon: CouponImageInput): Promise<voi
   const logo = await loadLogo();
 
   const width = 1200;
-  const height = 780;
+  const height = 840;
   const canvas = document.createElement("canvas");
   canvas.width = width * SCALE;
   canvas.height = height * SCALE;
@@ -185,7 +185,7 @@ export async function downloadCouponImage(coupon: CouponImageInput): Promise<voi
   ctx.fillStyle = COLORS.muted;
   const subtitle = wrapText(
     ctx,
-    `Top up $${coupon.verificationPaymentUsd} to verify your account — coupon applied at checkout.`,
+    `Make a verification top-up — coupon applied at checkout.`,
     innerW,
   );
   for (const line of subtitle) {
@@ -246,15 +246,14 @@ export async function downloadCouponImage(coupon: CouponImageInput): Promise<voi
   fillRound(ctx, left, y, innerW, footerH, 16, COLORS.footerFill);
 
   const pad = 24;
-  ctx.font = `500 17px ${FONT}`;
+  ctx.font = `500 15px ${FONT}`;
   ctx.fillStyle = COLORS.ink;
-  const body = wrapText(
-    ctx,
-    "Already have a Zerops account — open the promo link below. The coupon is applied automatically.",
-    innerW - pad * 2,
-  );
+  const bodyLines = [
+    "🎟️ Use the code on your first top-up, or redeem it later on its own.",
+    "🪙 Codes on the coins add credit with no payment.",
+  ];
   let footerY = y + 32;
-  for (const line of body) {
+  for (const line of bodyLines) {
     ctx.fillText(line, left + pad, footerY);
     footerY += 24;
   }
