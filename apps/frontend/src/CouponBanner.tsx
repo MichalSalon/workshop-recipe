@@ -66,10 +66,16 @@ export function CouponBanner({ embedded = false }: CouponBannerProps) {
 
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
               You already have an account — open{" "}
-              <strong className="text-foreground">Credit &amp; Spend</strong>, top up $
-              {coupon.verificationPaymentUsd} (verification payment), and enter{" "}
+              <strong className="text-foreground">Credit &amp; Spend</strong>, make a verification
+              top-up, and enter{" "}
               <strong className="text-foreground">{coupon.code}</strong> in the coupon field on the
               payment screen.
+            </p>
+            <p className="max-w-2xl space-y-1 text-sm leading-relaxed text-muted-foreground">
+              <span className="block">
+                🎟️ Use the code on your first top-up, or redeem it later on its own.
+              </span>
+              <span className="block">🪙 Codes on the coins add credit with no payment.</span>
             </p>
           </div>
 
