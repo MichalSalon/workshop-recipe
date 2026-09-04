@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { connect, JSONCodec } from "nats";
-import { NATS_JOBS_SUBJECT } from "@deck/shared";
+import { NATS_JOBS_QUEUE_GROUP, NATS_JOBS_SUBJECT } from "@deck/shared";
 
 export type JobHandler = (jobId: string) => Promise<void>;
 
@@ -58,6 +58,7 @@ export function natsSubjectFromEnv(env: NodeJS.ProcessEnv = process.env): string
 export async function createNatsBus(
   input: string | NatsConnect,
   subject: string = natsSubjectFromEnv(),
+  queue: string = NATS_JOBS_QUEUE_GROUP,
 ): Promise<Bus> {
   const opts = typeof input === "string" ? { servers: input } : input;
   const nc = await connect(opts);
@@ -67,7 +68,9 @@ export async function createNatsBus(
       nc.publish(subject, codec.encode({ jobId }));
     },
     async subscribe(handler) {
-      const sub = nc.subscribe(subject);
+      // Queue group, not a bare subscribe: NATS hands each job to exactly one member, so
+      // scaling the worker to N containers spreads the load instead of rendering N copies.
+      const sub = nc.subscribe(subject, { queue });
       void (async () => {
         for await (const msg of sub) {
           const { jobId } = codec.decode(msg.data);
